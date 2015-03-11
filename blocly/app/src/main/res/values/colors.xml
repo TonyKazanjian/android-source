@@ -17,4 +17,9 @@
     <color name="black_26">#3A000000</color>
     <color name="black_12">#1B000000</color>
 
+
+    <color name = "newTextColor">#FF5CA62E</color>
+    <color name = "newBarColor">#ff51d94e</color>
+    <color name = "newStatusBarColor">#ff3ea33e</color>
+
 </resources>
