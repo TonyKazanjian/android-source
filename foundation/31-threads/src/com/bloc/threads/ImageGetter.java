@@ -4,10 +4,11 @@ import java.net.URL;
 import java.io.*;
 import javax.imageio.*;
 import java.awt.image.BufferedImage;
+import java.net.MalformedURLException;
 public class ImageGetter extends Thread {
 
-	private URL = mURL;
-	private boolean 
+	private URL mURL;
+	private boolean mOpenWhenCompleted;
 
 	/*
 	 * ImageGetter
@@ -26,8 +27,14 @@ public class ImageGetter extends Thread {
  	 *	behavior as described above.
 	/************************************************/
 	public ImageGetter(String url, boolean openWhenCompleted){
-
-	}
+	    try{
+	        mURL = new URL(url);
+	    mOpenWhenCompleted = openWhenCompleted;
+	  }
+	   catch (MalformedURLException e)
+	        {  }
+	       }
+	
 
 	@Override
 	public void run() {
@@ -36,7 +43,7 @@ public class ImageGetter extends Thread {
  		 *	Perform the work found in `Main.java` in this
  		 *	Thread instead.
 		/************************************************/
-			try {
+		try {
 			File existingImage = new File("google_logo.png");
 			if (existingImage.exists()) {
 				existingImage.delete();
@@ -44,11 +51,14 @@ public class ImageGetter extends Thread {
 			URL url = new URL("https://www.google.com/images/srpr/logo11w.png");
 			BufferedImage bufferedImage = ImageIO.read(url);
 			File outputfile = new File("google_logo.png");
+			System.out.println();
 			ImageIO.write(bufferedImage, "png", outputfile);
 			if ("/".equals(System.getProperties().getProperty("file.separator"))) {
 				Runtime.getRuntime().exec("open google_logo.png");
 			} else {
-				Runtime.getRuntime().exec("google_logo.png");
+				
+			    System.out.println("would have opened Googlel logo");
+			    //Runtime.getRuntime().exec("google_logo.png");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
