@@ -19,6 +19,7 @@ android:id="@+id/tv_rss_item_feed_title"
 android:layout_width="match_parent"
 android:layout_height="wrap_content"
 
+
     android:layout_below="@+id/tv_rss_item_title"
 
     android:layout_marginTop="8dp"
@@ -37,5 +38,7 @@ android:text="A giant squid appeared abruptly today in lower Manhattan. The squi
 android:layout_marginTop="8dp"
 android:textSize="14sp"
 android:textColor="@color/text_primary"/>
+
+
 
 </RelativeLayout>
