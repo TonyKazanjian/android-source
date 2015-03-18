@@ -27,6 +27,7 @@ public class BloclyActivity extends Activity{
     recyclerView.setItemAnimator(new DefaultItemAnimator());
     recyclerView.setAdapter(itemAdapter);
 
+
 }
 
 

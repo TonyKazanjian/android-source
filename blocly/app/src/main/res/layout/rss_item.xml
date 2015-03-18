@@ -11,6 +11,7 @@
     android:id="@+id/tv_rss_item_title"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_below="@+id/tv_rss_item_feed_title"
     android:text="New York Attacked By Giant Squid"/>
 
     <io.bloc.android.blocly.ui.widget.RobotoTextView
@@ -18,9 +19,10 @@
 android:id="@+id/tv_rss_item_feed_title"
 android:layout_width="match_parent"
 android:layout_height="wrap_content"
-android:layout_below="@+id/tv_rss_item_title"
-android:layout_marginTop="8dp"
-android:text="New York Times"/>
+        android:text="New York Times"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 
 
@@ -29,9 +31,10 @@ android:text="New York Times"/>
 android:id="@+id/tv_rss_item_content"
 android:layout_width="match_parent"
 android:layout_height="wrap_content"
-android:layout_below="@+id/tv_rss_item_feed_title"
-android:text="A giant squid appeared abruptly today in lower Manhattan. The squid appeared peaceful at first but violence quickly escalated after a tourist attempted to have their photo taken with the \'big city octopus\'."
-android:layout_marginTop="8dp"/>
+        android:text="A giant squid appeared abruptly today in lower Manhattan. The squid appeared peaceful at first but violence quickly escalated after a tourist attempted to have their photo taken with the \'big city octopus\'."
+        android:layout_below="@+id/tv_rss_item_title"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 
 

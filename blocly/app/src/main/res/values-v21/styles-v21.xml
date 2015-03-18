@@ -19,7 +19,7 @@
 
         <item name="android:ellipsize">end</item>
 
-        <item name="robotoFont">Regular</item>
+        <item name="robotoFont"> BlackItalic</item>
     </style>
 
     <style name="Caption">
@@ -27,7 +27,8 @@
         <item name="android:textSize">12sp</item>
         <item name="android:lines">1</item>
         <item name="android:ellipsize">end</item>
-        <item name="robotoFont">Regular</item>
+        <item name="robotoStyle"> Light</item>
+        <item name = "condensed">true</item>
     </style>
 
     <style name="Body1">
