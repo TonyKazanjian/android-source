@@ -118,30 +118,35 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
           */
 
         @Override
-        public void onLoadingStarted(String imageUri, View view) {
-
+        public void onLoadingStarted(String imageUrl, View view) {
+         animateImage(false);
         }
 
         @Override
-        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-            Log.e(TAG, "onLoadingFailed: " + failReason.toString() + " for URL: " + imageUri);
+        public void onLoadingFailed(String imageUrl, View view, FailReason failReason) {
+            Log.e(TAG, "onLoadingFailed: " + failReason.toString() + " for URL: " + imageUrl);
+            animateImage(!contentExpanded);
         }
 
         @Override
-        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+        public void onLoadingComplete(String imageUrl, View view, Bitmap loadedImage) {
 
 // #10
             //if (imageUri.equals(imageURL)) {
-            if (imageUri.equals(rssItem.getImageUrl())) {
+            if (imageUrl.equals(rssItem.getImageUrl())) {
                 headerImage.setImageBitmap(loadedImage);
                 headerImage.setVisibility(View.VISIBLE);
-            }
+                animateImage(contentExpanded);}
+
+            else animateImage(!contentExpanded);
+            Log.i(TAG, "Loading complete");
         }
 
         @Override
-        public void onLoadingCancelled(String imageUri, View view) {
+        public void onLoadingCancelled(String imageUrl, View view) {
             // Attempt a retry
-            ImageLoader.getInstance().loadImage(imageUri, this);
+            ImageLoader.getInstance().loadImage(imageUrl, this);
+            animateImage(!contentExpanded);
         }
          /*
           * OnClickListener
@@ -155,6 +160,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 //                expandedContentWrapper.setVisibility(contentExpanded ? View.VISIBLE : View.GONE);
 //                content.setVisibility(contentExpanded ? View.GONE : View.VISIBLE);
                 animateContent(!contentExpanded);
+
             } else {
                 Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
             }
@@ -228,6 +234,55 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                 valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
                 valueAnimator.start();
             }
+
+        private void animateImage(final boolean expand) {
+            if ((expand && contentExpanded) || (!expand && !contentExpanded)){
+                return;
+            }
+// #2
+            int startingHeight = headerWrapper.getMeasuredHeight();
+            int finalHeight = content.getMeasuredHeight();
+            if (expand) {
+// #3
+                startingHeight = finalHeight;
+                headerWrapper.setAlpha(0f);
+                headerWrapper.setVisibility(View.VISIBLE);
+// #4
+                headerWrapper.measure(
+                        View.MeasureSpec.makeMeasureSpec(content.getWidth(), View.MeasureSpec.EXACTLY),
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                finalHeight = headerWrapper.getMeasuredHeight();
+            } else {
+                headerImage.setVisibility(View.VISIBLE);
+            }
+            startAnimator(startingHeight,finalHeight, new ValueAnimator.AnimatorUpdateListener(){
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator){
+// #5
+                    float animatedFraction = valueAnimator.getAnimatedFraction();
+                    float wrapperAlpha = expand ? animatedFraction : 1f - animatedFraction;
+                    float contentAlpha = 1f - wrapperAlpha;
+
+                    headerWrapper.setAlpha(wrapperAlpha);
+                    headerImage.setAlpha(contentAlpha);
+                    // #6
+                    headerWrapper.getLayoutParams().height = animatedFraction == 1f ?
+                            ViewGroup.LayoutParams.WRAP_CONTENT :
+                            (Integer) valueAnimator.getAnimatedValue();
+
+                    // #7
+                    headerWrapper.requestLayout();
+                    if(animatedFraction == 1f){
+                        if (expand) {
+                            headerImage.setVisibility(View.GONE);
+                        } else {
+                            headerWrapper.setVisibility(View.GONE);
+                        }
+                    }
+                }
+            });
+            contentExpanded = expand;
+        }
 
     }
 }
