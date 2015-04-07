@@ -12,11 +12,12 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+
+import java.lang.ref.WeakReference;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
@@ -31,6 +32,16 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
     // #11
     private static String TAG = ItemAdapter.class.getSimpleName();
     private static Throwable tr = new Throwable("this is a throwable");
+
+    public static interface ItemAdapterDelegate {
+        public void didAnimateRssItem(ItemAdapter adapter, RssItem rssItem, boolean animateItem);
+        public void didVisitSite(ItemAdapter adapter, RssItem rssItem);
+        public void didFavoriteItem(ItemAdapter adapter, CheckBox checkbox);
+        public void didArchiveItem(ItemAdapter adapter, CheckBox checkbox);
+    }
+
+    WeakReference<ItemAdapterDelegate> delegate;
+
     // #6
     @Override
     public ItemAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int index) {
@@ -51,8 +62,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         return BloclyApplication.getSharedDataSource().getItems().size();
     }
 
+    public ItemAdapterDelegate getDelegate() {
+        if (delegate == null) {
+            return null;
+        }
+        return delegate.get();
+    }
+
+    public void setDelegate(ItemAdapterDelegate delegate) {
+        this.delegate = new WeakReference<ItemAdapterDelegate>(delegate);
+    }
+
     // #9
-    class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    public class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
         boolean contentExpanded;
         TextView title;
         TextView feed;
@@ -93,7 +115,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         }
 
         void update(RssFeed rssFeed, RssItem rssItem) {
-                this.rssItem = rssItem;
+            this.rssItem = rssItem;
             feed.setText(rssFeed.getTitle());
             title.setText(rssItem.getTitle());
             content.setText(rssItem.getDescription());
@@ -101,7 +123,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
             //imageURL = rssItem.getImageUrl();
             //if (imageURL != null) {
-            if (rssItem.getImageUrl()!= null){
+            if (rssItem.getImageUrl() != null) {
 // #8
                 headerWrapper.setVisibility(View.VISIBLE);
                 headerImage.setVisibility(View.INVISIBLE);
@@ -151,13 +173,20 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         @Override
         public void onClick(View view) {
             if (view == itemView) {
+                animateContent(!contentExpanded);
+            } else {
+                getDelegate().didVisitSite(ItemAdapter.this, rssItem);
+            }
+
+
+            //if (view == itemView) {
 //                contentExpanded = !contentExpanded;
 //                expandedContentWrapper.setVisibility(contentExpanded ? View.VISIBLE : View.GONE);
 //                content.setVisibility(contentExpanded ? View.GONE : View.VISIBLE);
-                animateContent(!contentExpanded);
-            } else {
-                Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
-            }
+            //animateContent(!contentExpanded);
+            //} else {
+            //Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
+            //}
         }
 
          /*
@@ -166,14 +195,26 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-// #4
-                Log.v(TAG, "Checked changed to: " + isChecked);
+            if (getDelegate() == null) {
+                return;
+            } else {
+                getDelegate().didFavoriteItem(ItemAdapter.this, favoriteCheckbox);
+                getDelegate().didArchiveItem(ItemAdapter.this, archiveCheckbox);
+            }
+            //Log.v(TAG, "Checked changed to: " + isChecked);
         }
-// #1
-        private void animateContent(final boolean expand) {
-            if ((expand && contentExpanded) || (!expand && !contentExpanded)){
+
+        // #1
+        public void animateContent(final boolean expand) {
+            if (getDelegate() == null) {
+                return;
+            } else {
+                getDelegate().didAnimateRssItem(ItemAdapter.this, rssItem, contentExpanded );
+            }
+          if((expand && contentExpanded) || (!expand && !contentExpanded)) {
                 return;
             }
+
 // #2
             int startingHeight = expandedContentWrapper.getMeasuredHeight();
             int finalHeight = content.getMeasuredHeight();
@@ -190,9 +231,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             } else {
                 content.setVisibility(View.VISIBLE);
             }
-            startAnimator(startingHeight,finalHeight, new ValueAnimator.AnimatorUpdateListener(){
+            startAnimator(startingHeight, finalHeight, new ValueAnimator.AnimatorUpdateListener() {
                 @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator){
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
 // #5
                     float animatedFraction = valueAnimator.getAnimatedFraction();
                     float wrapperAlpha = expand ? animatedFraction : 1f - animatedFraction;
@@ -200,14 +241,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
                     expandedContentWrapper.setAlpha(wrapperAlpha);
                     content.setAlpha(contentAlpha);
- // #6
+                    // #6
                     expandedContentWrapper.getLayoutParams().height = animatedFraction == 1f ?
                             ViewGroup.LayoutParams.WRAP_CONTENT :
                             (Integer) valueAnimator.getAnimatedValue();
 
- // #7
+                    // #7
                     expandedContentWrapper.requestLayout();
-                    if(animatedFraction == 1f){
+                    if (animatedFraction == 1f) {
                         if (expand) {
                             content.setVisibility(View.GONE);
                         } else {
@@ -219,15 +260,19 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             contentExpanded = expand;
         }
 
-            private void startAnimator(int start, int end, ValueAnimator.AnimatorUpdateListener animatorUpdateListener) {
-                ValueAnimator valueAnimator = ValueAnimator.ofInt(start, end);
-                valueAnimator.addUpdateListener(animatorUpdateListener);
-                //#8
-                valueAnimator.setDuration(itemView.getResources().getInteger(android.R.integer.config_mediumAnimTime));
-                // #9
-                valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                valueAnimator.start();
-            }
+
+        private void startAnimator(int start, int end, ValueAnimator.AnimatorUpdateListener animatorUpdateListener) {
+            ValueAnimator valueAnimator = ValueAnimator.ofInt(start, end);
+            valueAnimator.addUpdateListener(animatorUpdateListener);
+            //#8
+            valueAnimator.setDuration(itemView.getResources().getInteger(android.R.integer.config_mediumAnimTime));
+            // #9
+            valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            valueAnimator.start();
+        }
 
     }
 }
+
+
+

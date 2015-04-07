@@ -10,21 +10,26 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
+import io.bloc.android.blocly.api.model.RssItem;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 
 /**
  * Created by tonyk_000 on 3/9/2015.
  */
-public class BloclyActivity extends ActionBarActivity implements NavigationDrawerAdapter.NavigationDrawerAdapterDelegate {
+public class BloclyActivity extends ActionBarActivity implements NavigationDrawerAdapter.NavigationDrawerAdapterDelegate,
+ItemAdapter.ItemAdapterDelegate {
     private ItemAdapter itemAdapter;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private NavigationDrawerAdapter navigationDrawerAdapter;
+    private ItemAdapter.ItemAdapterViewHolder itemAdapterViewHolder;
+
 @Override
     protected void onCreate(Bundle savedInstanceState){
     super.onCreate(savedInstanceState);
@@ -36,6 +41,7 @@ public class BloclyActivity extends ActionBarActivity implements NavigationDrawe
     itemAdapter = new ItemAdapter();
     navigationDrawerAdapter = new NavigationDrawerAdapter();
     navigationDrawerAdapter.setDelegate(this);
+    itemAdapter.setDelegate(this);
     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
     RecyclerView navigationRecyclerView = (RecyclerView) findViewById((R.id.rv_nav_activity_blocly));
 // #12
@@ -86,6 +92,29 @@ public class BloclyActivity extends ActionBarActivity implements NavigationDrawe
     public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed) {
         drawerLayout.closeDrawers();
         Toast.makeText(this, "Show RSS items from " + rssFeed.getTitle(), Toast.LENGTH_SHORT).show();
+    }
+
+    /*
+     * ItemAdapterDelegate
+     */
+    @Override
+    public void didAnimateRssItem(ItemAdapter adapter, RssItem rssItem, boolean animateItem){
+
+
+    }
+
+    @Override
+    public void didVisitSite(ItemAdapter adapter, RssItem rssItem){
+        Toast.makeText(this, "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void didFavoriteItem (ItemAdapter adapter, CheckBox checkbox){
+
+    }
+
+    public void didArchiveItem (ItemAdapter adapter, CheckBox checkbox){
+
     }
 }
 
