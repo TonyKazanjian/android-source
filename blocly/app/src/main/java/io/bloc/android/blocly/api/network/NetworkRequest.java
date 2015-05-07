@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Created by tonyk_000 on 5/1/2015.
  */
 
-    public abstract class NetworkRequest<Result> {
+    public abstract class NetworkRequest<RssFeed> {
 
         // #2
         public static final int ERROR_IO = 1;
@@ -26,7 +27,7 @@ import java.net.URL;
         }
 
         // #3
-        public abstract Result performRequest();
+        public abstract List<io.bloc.android.blocly.api.model.RssFeed> performRequest();
 
     // #4
     protected InputStream openStream(String urlString) {

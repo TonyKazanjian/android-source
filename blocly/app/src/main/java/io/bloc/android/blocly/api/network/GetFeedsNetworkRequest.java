@@ -15,6 +15,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import io.bloc.android.blocly.api.DataSource;
+import io.bloc.android.blocly.api.model.RssFeed;
+import io.bloc.android.blocly.api.model.RssItem;
+
 /**
  * Created by tonyk_000 on 5/1/2015.
  */
@@ -33,18 +37,18 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_ATTRIBUTE_TYPE = "type";
 
     // #7
-    String [] feedUrls;
+    DataSource [] dataSource;
 
-    public GetFeedsNetworkRequest(String... feedUrls) {
-        this.feedUrls = feedUrls;
+    public GetFeedsNetworkRequest(DataSource... dataSource) {
+        this.dataSource = dataSource;
     }
 
     // #8
     @Override
-     public List<FeedResponse> performRequest()  {
-        List<FeedResponse> responseFeeds = new ArrayList<FeedResponse>(feedUrls.length);
-        for (String feedUrlString : feedUrls) {
-            InputStream inputStream = openStream(feedUrlString);
+     public List<RssFeed> performRequest()  {
+        List<RssFeed> responseFeeds = new ArrayList<RssFeed>(dataSource.length);
+        for (DataSource feedData : dataSource) {
+            InputStream inputStream = openStream(feedData);
             if (inputStream == null) {
                 return null;
             }
@@ -59,7 +63,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
 
                 // #6
                 NodeList allItemNodes = xmlDocument.getElementsByTagName(XML_TAG_ITEM);
-                List<ItemResponse> responseItems = new ArrayList<ItemResponse>(allItemNodes.getLength());
+                List<RssItem> responseItems = new ArrayList<RssItem>(allItemNodes.getLength());
                 for (int itemIndex = 0; itemIndex < allItemNodes.getLength(); itemIndex++) {
 // #7
                     String itemURL = null;
@@ -94,10 +98,11 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                             itemGUID = tagNode.getTextContent();
                         }
                     }
-                    responseItems.add(new ItemResponse(itemURL, itemTitle, itemDescription,
-                            itemGUID, itemPubDate, itemEnclosureURL, itemEnclosureMIMEType));
+                    RssItem rssItem = new RssItem(itemGUID,itemTitle,itemDescription, itemURL,"",0,0,false,false,false);
+                    responseItems.add(rssItem);
                 }
-                responseFeeds.add(new FeedResponse(feedUrlString, channelTitle, channelURL, channelDescription, responseItems));
+                RssFeed rssFeed = new RssFeed(channelTitle,channelDescription,channelURL,"");
+                responseFeeds.add(rssFeed);
                 inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
