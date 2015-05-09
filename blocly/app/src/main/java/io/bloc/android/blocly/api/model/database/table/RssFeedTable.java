@@ -18,7 +18,7 @@ public class RssFeedTable extends Table {
     @Override
     public String getCreateStatement() {
         // #3
-        return "CREATE TABLE " + getName() + " ("
+        return "CREATE TABLE IF NOT EXISTS " + getName() + " ("
                 + COLUMN_ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_LINK + " TEXT,"
                 + COLUMN_TITLE + " TEXT,"
