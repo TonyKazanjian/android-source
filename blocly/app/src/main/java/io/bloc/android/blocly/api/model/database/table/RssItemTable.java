@@ -28,7 +28,7 @@ public class RssItemTable extends Table {
                 + COLUMN_LINK + " TEXT,"
                 + COLUMN_TITLE + " TEXT,"
                 + COLUMN_DESCRIPTION + " TEXT,"
-                + COLUMN_GUID + " TEXT,"
+                + COLUMN_GUID + " TEXT UNIQUE,"
                 + COLUMN_PUB_DATE + " INTEGER,"
                 + COLUMN_ENCLOSURE + " TEXT,"
                 + COLUMN_MIME_TYPE + " TEXT,"

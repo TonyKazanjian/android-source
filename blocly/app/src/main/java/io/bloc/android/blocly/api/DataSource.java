@@ -44,11 +44,16 @@ public class DataSource {
                 }
                 // #8
                 SQLiteDatabase writableDatabase = databaseOpenHelper.getWritableDatabase();
-                new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
-                //inserting RSS Feed into database
+                List<GetFeedsNetworkRequest.FeedResponse> feedRequest = new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
+                //inserting RSS Feed and items into database
                 ContentValues contentValues = new ContentValues();
-                contentValues.put(rssFeedTable.getCreateStatement(),rssFeedTable.getName());
-                writableDatabase.insert(rssFeedTable.getName(),null,contentValues);
+                contentValues.put("guid", rssItemTable.getCreateStatement());
+                if (!contentValues.containsKey(rssItemTable.getCreateStatement()))
+                    writableDatabase.insert(rssItemTable.getName(), null, contentValues);
+                else writableDatabase.insert(null,null,null);
+
+
+
             }
         }).start();
     }

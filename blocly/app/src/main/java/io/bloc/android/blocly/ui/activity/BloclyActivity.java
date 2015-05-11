@@ -183,7 +183,7 @@ implements
         drawerLayout.closeDrawers();
         Toast.makeText(this, "Show RSS items from " + rssFeed.getTitle(), Toast.LENGTH_SHORT).show();
     }
-         /*
+     /*
       * ItemAdapter.DataSource
       */
 
