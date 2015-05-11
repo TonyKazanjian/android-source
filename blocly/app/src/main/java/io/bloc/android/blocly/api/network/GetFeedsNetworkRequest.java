@@ -129,7 +129,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         public final String channelDescription;
         public final List<ItemResponse> channelItems;
 
-        FeedResponse(String channelFeedURL, String channelTitle, String channelURL,
+      public FeedResponse(String channelFeedURL, String channelTitle, String channelURL,
                      String channelDescription, List<ItemResponse> channelItems) {
             this.channelFeedURL = channelFeedURL;
             this.channelTitle = channelTitle;
@@ -149,7 +149,8 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         public final String itemEnclosureURL;
         public final String itemEnclosureMIMEType;
 
-        ItemResponse(String itemURL, String itemTitle, String itemDescription,
+
+       public ItemResponse(String itemURL, String itemTitle, String itemDescription,
                      String itemGUID, String itemPubDate, String itemEnclosureURL,
                      String itemEnclosureMIMEType) {
             this.itemURL = itemURL;
