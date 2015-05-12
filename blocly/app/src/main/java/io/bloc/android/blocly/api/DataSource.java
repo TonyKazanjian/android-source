@@ -26,8 +26,7 @@ public class DataSource {
     private RssItemTable rssItemTable;
     private List<RssFeed> feeds;
     private List<RssItem> items;
-    private GetFeedsNetworkRequest.FeedResponse feedResponse;
-    private List<GetFeedsNetworkRequest.ItemResponse> itemResponse;
+
 
     public DataSource() {
         rssFeedTable = new RssFeedTable();
@@ -45,18 +44,18 @@ public class DataSource {
                     BloclyApplication.getSharedInstance().deleteDatabase("blocly_db");
                 }
                 // #8
-                List<GetFeedsNetworkRequest.FeedResponse> feedRequest = new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
-                feedResponse = new GetFeedsNetworkRequest.FeedResponse("feed_url","title","link","description",itemResponse);
-                feedRequest.add(feedResponse);
+                List<GetFeedsNetworkRequest.FeedResponse> feedResponse = new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
+                GetFeedsNetworkRequest.FeedResponse androidCentral = feedResponse.get(0);
                 SQLiteDatabase writableDatabase = databaseOpenHelper.getWritableDatabase();
-                //inserting RSS Feed and items into database
                 ContentValues contentValues = new ContentValues();
-                contentValues.put("guid", rssItemTable.getCreateStatement());
-
-                if (!contentValues.containsKey("guid")){
-                    writableDatabase.insert(rssItemTable.getName(), null, contentValues);
-                    writableDatabase.close();}
-                else writableDatabase.close();
+                //interating through the feed and inserting items
+                for (GetFeedsNetworkRequest.ItemResponse itemResponse : androidCentral.channelItems) {
+                    contentValues.put("guid", itemResponse.itemGUID);
+                    if (!contentValues.containsKey("guid")) {
+                        writableDatabase.insert(rssItemTable.getName(), null, contentValues);
+                        writableDatabase.close();
+                    } else writableDatabase.close();
+                }
 
 
 
