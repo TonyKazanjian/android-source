@@ -1,6 +1,8 @@
 package io.bloc.android.blocly.ui.activity;
 
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +23,7 @@ import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
+import io.bloc.android.blocly.api.model.database.table.RssItemTable;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 
@@ -248,6 +251,10 @@ implements
 // #3
             recyclerView.smoothScrollBy(0, viewToExpand.getTop()- lessToScroll);
         }
+    //assignment 54
+    SQLiteDatabase db;
+    RssItemTable rssItemTable;
+    public Cursor cursor =  db.query(false, rssItemTable.getName(), null,null,null,null,null, "ORDER BY pub_date, ","LIMIT 20");
     }
 
 
