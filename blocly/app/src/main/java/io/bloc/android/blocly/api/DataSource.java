@@ -19,13 +19,16 @@ public class DataSource {
     public DataSource() {
         feeds = new ArrayList<RssFeed>();
         items = new ArrayList<RssItem>();
-        createFakeData(feeds);
+
 
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
+               GetFeedsNetworkRequest androidCentral = new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml");
+                androidCentral.performRequest();
+                feeds = androidCentral.responseFeeds;
+                items = androidCentral.responseItems;
             }
         }).start();
     }

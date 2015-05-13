@@ -15,7 +15,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
 
@@ -35,6 +34,8 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_TAG_ENCLOSURE = "enclosure";
     private static final String XML_ATTRIBUTE_URL = "url";
     private static final String XML_ATTRIBUTE_TYPE = "type";
+    public static ArrayList<RssFeed> responseFeeds;
+    public static ArrayList<RssItem> responseItems;
 
     // #7
     String [] feedUrls;
@@ -46,7 +47,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     // #8
     @Override
      public List<RssFeed> performRequest()  {
-        List<RssFeed> responseFeeds = new ArrayList<RssFeed>(feedUrls.length);
+        responseFeeds = new ArrayList<RssFeed>(feedUrls.length);
         for (String feedUrlString : feedUrls) {
             InputStream inputStream = openStream(feedUrlString);
             if (inputStream == null) {
@@ -63,7 +64,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
 
                 // #6
                 NodeList allItemNodes = xmlDocument.getElementsByTagName(XML_TAG_ITEM);
-                List<RssItem> responseItems = new ArrayList<RssItem>(allItemNodes.getLength());
+                responseItems = new ArrayList<RssItem>(allItemNodes.getLength());
                 for (int itemIndex = 0; itemIndex < allItemNodes.getLength(); itemIndex++) {
 // #7
                     String itemURL = null;
@@ -103,8 +104,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                 }
                 RssFeed rssFeed = new RssFeed(channelTitle,channelDescription,channelURL,"");
                 responseFeeds.add(rssFeed);
-                DataSource fakeData = new DataSource();
-                fakeData.createFakeData(responseFeeds);
+
                 inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
