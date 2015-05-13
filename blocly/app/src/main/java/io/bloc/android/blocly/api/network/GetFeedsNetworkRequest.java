@@ -37,18 +37,18 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_ATTRIBUTE_TYPE = "type";
 
     // #7
-    DataSource [] dataSource;
+    String [] feedUrls;
 
-    public GetFeedsNetworkRequest(DataSource... dataSource) {
-        this.dataSource = dataSource;
+    public GetFeedsNetworkRequest(String... feedUrls) {
+        this.feedUrls = feedUrls;
     }
 
     // #8
     @Override
      public List<RssFeed> performRequest()  {
-        List<RssFeed> responseFeeds = new ArrayList<RssFeed>(dataSource.length);
-        for (DataSource feedData : dataSource) {
-            InputStream inputStream = openStream(feedData);
+        List<RssFeed> responseFeeds = new ArrayList<RssFeed>(feedUrls.length);
+        for (String feedUrlString : feedUrls) {
+            InputStream inputStream = openStream(feedUrlString);
             if (inputStream == null) {
                 return null;
             }
@@ -103,6 +103,8 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                 }
                 RssFeed rssFeed = new RssFeed(channelTitle,channelDescription,channelURL,"");
                 responseFeeds.add(rssFeed);
+                DataSource fakeData = new DataSource();
+                fakeData.createFakeData(responseFeeds);
                 inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();

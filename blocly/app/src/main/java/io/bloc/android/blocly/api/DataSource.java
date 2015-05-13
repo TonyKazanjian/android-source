@@ -19,7 +19,7 @@ public class DataSource {
     public DataSource() {
         feeds = new ArrayList<RssFeed>();
         items = new ArrayList<RssItem>();
-        createFakeData();
+        createFakeData(feeds);
 
 
         new Thread(new Runnable() {
@@ -38,7 +38,8 @@ public class DataSource {
         return items;
     }
 
-    void createFakeData() {
+    public List<RssFeed> createFakeData(List<RssFeed> fakeFeed) {
+
         feeds.add(new RssFeed("My Favorite Feed",
                 "This feed is just incredible, I can't even begin to tell you…",
                 "http://favoritefeed.net", "http://feeds.feedburner.com/favorite_feed?format=xml"));
@@ -50,5 +51,6 @@ public class DataSource {
                     "http://rs1img.memecdn.com/silly-dog_o_511213.jpg",
                     0, System.currentTimeMillis(), false, false, true));
         }
+        return feeds;
     }
 }
