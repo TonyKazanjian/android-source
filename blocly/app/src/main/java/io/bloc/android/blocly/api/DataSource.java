@@ -1,6 +1,7 @@
 package io.bloc.android.blocly.api;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class DataSource {
                 List<GetFeedsNetworkRequest.FeedResponse> feedResponse = new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
                 GetFeedsNetworkRequest.FeedResponse androidCentral = feedResponse.get(0);
                 SQLiteDatabase writableDatabase = databaseOpenHelper.getWritableDatabase();
+                SQLiteDatabase readableDatabase = databaseOpenHelper.getReadableDatabase();
 
                 //interating through the feed and inserting items
                 for (GetFeedsNetworkRequest.ItemResponse itemResponse : androidCentral.channelItems) {
@@ -55,7 +57,9 @@ public class DataSource {
                     contentValues.put("title", itemResponse.itemTitle);
                     contentValues.put("link", itemResponse.itemURL);
                     contentValues.put("description", itemResponse.itemDescription);
-                    if (!contentValues.containsKey("guid")) {
+                    Cursor cursor = readableDatabase.rawQuery("SELECT COUNT (GUID) FROM "  + rssItemTable.getName() +" WHERE GUID = "
+                            + itemResponse.itemGUID, null);
+                    if (cursor.getCount()==0) {
                         writableDatabase.insert(rssItemTable.getName(), null, contentValues);
                         writableDatabase.close();
                     } else writableDatabase.close();
