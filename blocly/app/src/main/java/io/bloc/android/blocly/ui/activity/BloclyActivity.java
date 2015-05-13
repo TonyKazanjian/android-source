@@ -23,6 +23,7 @@ import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
+import io.bloc.android.blocly.api.model.database.DatabaseOpenHelper;
 import io.bloc.android.blocly.api.model.database.table.RssItemTable;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
@@ -252,9 +253,10 @@ implements
             recyclerView.smoothScrollBy(0, viewToExpand.getTop()- lessToScroll);
         }
     //assignment 54
-    SQLiteDatabase db;
+    DatabaseOpenHelper db = new DatabaseOpenHelper(BloclyApplication.getSharedInstance());
+    SQLiteDatabase readableDatabase = db.getReadableDatabase();
     RssItemTable rssItemTable;
-    public Cursor cursor =  db.query(false, rssItemTable.getName(), null,null,null,null,null, "ORDER BY pub_date, ","LIMIT 20");
+    public Cursor cursor =  readableDatabase.query(false, rssItemTable.getName(), null,null,null,null,null, "ORDER BY pub_date, ","LIMIT 20");
     }
 
 

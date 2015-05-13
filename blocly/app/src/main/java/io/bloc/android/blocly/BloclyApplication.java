@@ -21,6 +21,8 @@ import io.bloc.android.blocly.api.DataSource;
             return sharedInstance;
         }
 
+
+
         // #2
         public static DataSource getSharedDataSource() {
             return BloclyApplication.getSharedInstance().getDataSource();
@@ -35,6 +37,7 @@ import io.bloc.android.blocly.api.DataSource;
             super.onCreate();
             sharedInstance = this;
             dataSource = new DataSource();
+
             // #1
             DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                     .cacheOnDisk(true)
