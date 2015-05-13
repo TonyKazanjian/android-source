@@ -47,10 +47,14 @@ public class DataSource {
                 List<GetFeedsNetworkRequest.FeedResponse> feedResponse = new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
                 GetFeedsNetworkRequest.FeedResponse androidCentral = feedResponse.get(0);
                 SQLiteDatabase writableDatabase = databaseOpenHelper.getWritableDatabase();
-                ContentValues contentValues = new ContentValues();
+
                 //interating through the feed and inserting items
                 for (GetFeedsNetworkRequest.ItemResponse itemResponse : androidCentral.channelItems) {
+                    ContentValues contentValues = new ContentValues();
                     contentValues.put("guid", itemResponse.itemGUID);
+                    contentValues.put("title", itemResponse.itemTitle);
+                    contentValues.put("link", itemResponse.itemURL);
+                    contentValues.put("description", itemResponse.itemDescription);
                     if (!contentValues.containsKey("guid")) {
                         writableDatabase.insert(rssItemTable.getName(), null, contentValues);
                         writableDatabase.close();
