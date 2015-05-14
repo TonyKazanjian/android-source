@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import io.bloc.android.blocly.BloclyApplication;
+import io.bloc.android.blocly.api.model.database.DatabaseOpenHelper;
+
 /**
  * Created by tonyk_000 on 5/5/2015.
  */
@@ -109,8 +112,16 @@ public class RssItemTable extends Table {
     private static final String COLUMN_FAVORITE = "is_favorite";
     private static final String COLUMN_ARCHIVED = "is_archived";
 
+    //checkpoint 55 assignment
+
+    DatabaseOpenHelper db = new DatabaseOpenHelper(BloclyApplication.getSharedInstance());
+    SQLiteDatabase readableDatabase = db.getReadableDatabase();
+    RssItemTable rssItemTable;
+    public Cursor cursor =  readableDatabase.query(false, rssItemTable.getName(), null,null,null,null,null, "ORDER BY pub_date, ","LIMIT 20");
+
+
     @Override
-    public String getName() {
+    public  String getName() {
         return "rss_items";
     }
 
