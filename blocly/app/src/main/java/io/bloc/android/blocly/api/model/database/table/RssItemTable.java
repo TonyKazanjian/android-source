@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import io.bloc.android.blocly.BloclyApplication;
+import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.database.DatabaseOpenHelper;
 
 /**
@@ -116,10 +117,36 @@ public class RssItemTable extends Table {
 
     DatabaseOpenHelper db = new DatabaseOpenHelper(BloclyApplication.getSharedInstance());
     SQLiteDatabase readableDatabase = db.getReadableDatabase();
-    RssItemTable rssItemTable;
+    RssItemTable.Builder rssItemTable = new RssItemTable.Builder();
+
     public Cursor cursor =  readableDatabase.query(false, rssItemTable.getName(), null,null,null,null,null, "ORDER BY pub_date, ","LIMIT 20");
 
-
+    //fetch all archived RSS items
+    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, boolean isArchived) {
+        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(rowId)}, null, "total(is_archived) = 1", null, null);
+    }
+    //fetch all archived RSS items from a particular RSS feed
+    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, boolean isArchived, RssFeed rssFeed) {
+        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(rowId)}, COLUMN_RSS_FEED, "total(is_archived) = 1", null, null);
+    }
+    //fetch all favorited RSS items
+    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, boolean isFavorite) {
+        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(rowId)}, null, "total(is_favorite) = 1", null, null);
+    }
+    //fetch all favorited RSS items from a particular RSS feed
+    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, boolean isFavorite, RssFeed rssFeed) {
+        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(rowId)}, COLUMN_RSS_FEED, "total(is_favorite) = 1", null, null);
+    }
+    //fetch all items from a particular RSS feed
+    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, RssFeed rssFeed) {
+        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(rowId)}, COLUMN_RSS_FEED, null, null, null);
+    }
+    //fetch all items from a particular RSS feed with a given OFFSET and LIMIT
     @Override
     public  String getName() {
         return "rss_items";
