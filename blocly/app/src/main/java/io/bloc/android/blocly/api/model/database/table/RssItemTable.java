@@ -127,7 +127,7 @@ public class RssItemTable extends Table {
         }
         sqlStatement.append(" OFFSET " + offset + " LIMIT " + limit);
         sqlStatement.append(";");
-        return readOnlyDatabase.rawQuery(sqlStatement.toString(), null);
+        return readOnlyDatabase.rawQuery(sqlStatement.toString(), new String[0]);
     }
 
     DatabaseOpenHelper db = new DatabaseOpenHelper(BloclyApplication.getSharedInstance());
