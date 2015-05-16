@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import io.bloc.android.blocly.BloclyApplication;
-import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.database.DatabaseOpenHelper;
 
 /**
@@ -115,38 +114,39 @@ public class RssItemTable extends Table {
 
     //checkpoint 55 assignment
 
+    //method to fetch archived items, favorited items, or all items in a particular feed
+    public Cursor fetchRow(SQLiteDatabase readOnlyDatabase, long rowId, Boolean isArchived, Boolean isFavorite,
+                           int offset, int limit) {
+        StringBuilder sqlStatement = new StringBuilder();
+        sqlStatement.append("SELECT * FROM " + COLUMN_RSS_FEED + " WHERE rowID = " + rowId);
+        if (isArchived != null) {
+            sqlStatement.append(" AND " + COLUMN_ARCHIVED + " = " + isArchived);
+        }
+        if (isFavorite != null) {
+            sqlStatement.append(" AND " + COLUMN_FAVORITE + " = " + isFavorite);
+        }
+        sqlStatement.append(" OFFSET " + offset + " LIMIT " + limit);
+        sqlStatement.append(";");
+        return readOnlyDatabase.rawQuery(sqlStatement.toString(), null);
+    }
+
     DatabaseOpenHelper db = new DatabaseOpenHelper(BloclyApplication.getSharedInstance());
     SQLiteDatabase readableDatabase = db.getReadableDatabase();
-    RssItemTable.Builder rssItemTable = new RssItemTable.Builder();
-
-    public Cursor cursor =  readableDatabase.query(false, rssItemTable.getName(), null,null,null,null,null, "ORDER BY pub_date, ","LIMIT 20");
-
-    //fetch all archived RSS items
-    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, boolean isArchived) {
-        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
-                new String[]{String.valueOf(rowId)}, null, "total(is_archived) = 1", null, null);
-    }
-    //fetch all archived RSS items from a particular RSS feed
-    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, boolean isArchived, RssFeed rssFeed) {
-        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
-                new String[]{String.valueOf(rowId)}, COLUMN_RSS_FEED, "total(is_archived) = 1", null, null);
-    }
-    //fetch all favorited RSS items
-    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, boolean isFavorite) {
-        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
-                new String[]{String.valueOf(rowId)}, null, "total(is_favorite) = 1", null, null);
-    }
-    //fetch all favorited RSS items from a particular RSS feed
-    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, boolean isFavorite, RssFeed rssFeed) {
-        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
-                new String[]{String.valueOf(rowId)}, COLUMN_RSS_FEED, "total(is_favorite) = 1", null, null);
-    }
-    //fetch all items from a particular RSS feed
-    public Cursor fetchRow(SQLiteDatabase readonlyDatabase, long rowId, RssFeed rssFeed) {
-        return readonlyDatabase.query(true, getName(), null, COLUMN_ID + " = ?",
-                new String[]{String.valueOf(rowId)}, COLUMN_RSS_FEED, null, null, null);
-    }
+    RssItemTable rssItemTable = new RssItemTable();
+    long feedId = new RssFeedTable.Builder().setTitle("cool feed").insert(readableDatabase);
+    //returning all archived Rss Items
+    Cursor findArchived = rssItemTable.fetchRow(readableDatabase, 0 ,true,null,0,0);
+    //returnign all archived Rss Items from a particular feed
+    Cursor findArchivedInFeed = rssItemTable.fetchRow(readableDatabase,feedId,true,null,0,0);
+    //returning all favorited
+    Cursor findFavorited = rssItemTable.fetchRow(readableDatabase,0,null,true,0,0);
+    //returning all favorited from a particular feed
+    Cursor findFavoritedInFeed = rssItemTable.fetchRow(readableDatabase,feedId,null,true,0,0);
+    //returning all items from a particular feed
+    Cursor allFromFeed = rssItemTable.fetchRow(readableDatabase,feedId,null,null,0,0);
     //fetch all items from a particular RSS feed with a given OFFSET and LIMIT
+    Cursor allFromFeedWithOffsetAndLimit = rssItemTable.fetchRow(readableDatabase,feedId,null,null,10,20);
+
     @Override
     public  String getName() {
         return "rss_items";
