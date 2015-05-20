@@ -7,12 +7,14 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +46,11 @@ implements
     private NavigationDrawerAdapter navigationDrawerAdapter;
     private Menu menu;
     private View overflowButton;
+    //assignment 48 - create menu item
+    private MenuItem share;
+    // create share action provider
+    private ShareActionProvider mShareActionProvider;
+
 
     private BroadcastReceiver dataSourceBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -171,16 +178,37 @@ implements
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+        //assignment 48 - share RSS item w/ other application
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        startActivity(sendIntent);
+        setShareIntent(sendIntent);
         Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         getMenuInflater().inflate(R.menu.blocly, menu);
         this.menu = menu;
+        share = (MenuItem) menu.findItem(R.id.action_share);
+        //fetch and store share action provider
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(share);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    //assignment 48 - new method for changing menu items at runtime
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        share.setVisible(false);
+        share.setEnabled(false);
+        return super.onPrepareOptionsMenu(menu);
+    }
+    // Call to update the share intent
+    private void setShareIntent(Intent shareIntent) {
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
     }
 
     @Override
@@ -245,8 +273,12 @@ implements
             if (itemAdapter.getExpandedItem() != rssItem) {
                 positionToExpand = BloclyApplication.getSharedDataSource().getItems().indexOf(rssItem);
                 itemAdapter.setExpandedItem(rssItem);
+                //assignment 48 - enable or hide share item
+                share.setVisible(true);
+                share.setEnabled(true);
             } else {
                 itemAdapter.setExpandedItem(null);
+                onPrepareOptionsMenu(menu);
             }
             if (positionToContract > -1) {
 // #5a
