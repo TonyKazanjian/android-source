@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -179,15 +178,20 @@ implements
             return true;
         }
         //assignment 48 - share RSS item w/ other application
-        Intent sendIntent = new Intent();
-        share = (MenuItem) menu.findItem(R.id.action_share);
-        //fetch and store share action provider
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(share);
-        sendIntent.setAction(Intent.ACTION_SEND);
-        startActivity(sendIntent);
-        setShareIntent(sendIntent);
-        mShareActionProvider.setShareIntent(sendIntent);
-        Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+        if (item.getItemId()== R.id.action_share){
+            RssItem itemToShare = itemAdapter.getExpandedItem();
+            if(itemToShare == null){
+                return false;
+            }
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT,
+                    String.format("%s (%s)", itemToShare.getTitle(), itemToShare.getUrl()));
+            sendIntent.setType("text/plain");
+            Intent chooser = Intent.createChooser(sendIntent,getString(R.string.share_chooser_title));
+            startActivity(chooser);
+        } else {
+            Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -301,7 +305,7 @@ implements
 // #2
             View viewToExpand = recyclerView.getLayoutManager().findViewByPosition(positionToExpand);
 // #3
-            recyclerView.smoothScrollBy(0, viewToExpand.getTop()- lessToScroll);
+            recyclerView.smoothScrollBy(0, viewToExpand.getTop() - lessToScroll);
         }
     }
 

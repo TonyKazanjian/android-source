@@ -5,8 +5,6 @@
     <item android:id="@+id/action_share"
         android:icon="@drawable/ic_share_selector"
         android:title="@string/menu_share"
-        blocly:actionProviderClass=
-            "android.support.v7.widget.ShareActionProvider"
         android:orderInCategory="0"
         blocly:showAsAction="ifRoom"
         tools:ignore="MenuTitle" />
