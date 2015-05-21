@@ -180,9 +180,13 @@ implements
         }
         //assignment 48 - share RSS item w/ other application
         Intent sendIntent = new Intent();
+        share = (MenuItem) menu.findItem(R.id.action_share);
+        //fetch and store share action provider
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(share);
         sendIntent.setAction(Intent.ACTION_SEND);
         startActivity(sendIntent);
         setShareIntent(sendIntent);
+        mShareActionProvider.setShareIntent(sendIntent);
         Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
         return super.onOptionsItemSelected(item);
     }
@@ -191,15 +195,13 @@ implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.blocly, menu);
         this.menu = menu;
-        share = (MenuItem) menu.findItem(R.id.action_share);
-        //fetch and store share action provider
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(share);
         return super.onCreateOptionsMenu(menu);
     }
 
     //assignment 48 - new method for changing menu items at runtime
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        share = (MenuItem) menu.findItem(R.id.action_share);
         share.setVisible(false);
         share.setEnabled(false);
         return super.onPrepareOptionsMenu(menu);
