@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +25,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
@@ -60,6 +63,16 @@ implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
+        //assignment 49 - getting information about intents
+        List<ResolveInfo> sendInfo = getPackageManager().queryIntentActivities(new Intent(Intent.ACTION_SEND),0);
+        List<ResolveInfo> dialInfo = getPackageManager().queryIntentActivities(new Intent(Intent.ACTION_DIAL), 0);
+        List<ResolveInfo> viewInfo = getPackageManager().queryIntentActivities(new Intent(Intent.ACTION_VIEW),0);
+        List<ResolveInfo> allInfo = new ArrayList<ResolveInfo>();
+        allInfo.addAll(sendInfo);
+        allInfo.addAll(dialInfo);
+        allInfo.addAll(viewInfo);
+
+        for (ResolveInfo thisInfo: allInfo) { Log.d("BloclyActivity", thisInfo.toString());}
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
