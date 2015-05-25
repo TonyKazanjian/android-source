@@ -25,4 +25,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:21.0.3'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
     compile files('libs/jsoup-1.8.2.jar')
+    compile files('libs/google-api-services-youtube-v3-rev137-1.20.0.jar')
 }

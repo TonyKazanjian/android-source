@@ -1,5 +1,7 @@
 package io.bloc.android.blocly.api.network;
 
+import com.google.api.services.youtube.YouTube;
+
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
@@ -35,6 +37,8 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_TAG_ENCLOSURE = "enclosure";
     private static final String XML_ATTRIBUTE_URL = "url";
     private static final String XML_ATTRIBUTE_TYPE = "type";
+    //checpoint 57 assignment
+    private static final String XML_TAG_IFRAME = "iframe";
 
     // #7
     String [] feedUrls;
@@ -77,6 +81,9 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                     String itemPubDate = null;
                     String itemEnclosureURL = null;
                     String itemEnclosureMIMEType = null;
+                    //for checkpoint 57
+
+                    String itemVideoURL = null;
 
                     //8
                     Node itemNode = allItemNodes.item(itemIndex);
@@ -102,14 +109,20 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                         } else if (XML_TAG_GUID.equalsIgnoreCase(tag)) {
                             itemGUID = tagNode.getTextContent();
                         } else if (XML_TAG_CONTENT_ENCODED.equalsIgnoreCase(tag)) {
-                        String contentEncoded = tagNode.getTextContent();
-                        itemImageURL = parseImageFromHTML(contentEncoded);
-                        itemContentEncodedText = parseTextFromHTML(contentEncoded);
-                    } else if (XML_TAG_MEDIA_CONTENT.equalsIgnoreCase(tag)){
+                            String contentEncoded = tagNode.getTextContent();
+                            itemImageURL = parseImageFromHTML(contentEncoded);
+                            itemContentEncodedText = parseTextFromHTML(contentEncoded);
+                        } else if (XML_TAG_MEDIA_CONTENT.equalsIgnoreCase(tag)) {
                             NamedNodeMap mediaAttributes = tagNode.getAttributes();
                             itemMediaURL = mediaAttributes.getNamedItem(XML_ATTRIBUTE_URL).getTextContent();
-                            itemMediaMIMEType = mediaAttributes.getNamedItem(XML_ATTRIBUTE_TYPE).getTextContent();}
+                            itemMediaMIMEType = mediaAttributes.getNamedItem(XML_ATTRIBUTE_TYPE).getTextContent();
+                        } //checkpoint 57 assignment
+                        else if (XML_TAG_IFRAME.equalsIgnoreCase(tag)){
+                            NamedNodeMap mediaAttributes = tagNode.getAttributes();
+                            itemVideoURL = mediaAttributes.getNamedItem(XML_TAG_IFRAME).getTextContent();
                         }
+
+                    }
                     if (itemEnclosureURL == null) {
                         itemEnclosureURL = itemImageURL;
                     }
@@ -161,6 +174,16 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
             return null;
         }
         return imgElements.attr("src");
+    }
+    //checkpoint 57
+
+    static String parseThumbnail(String htmlString){
+        YouTube.Thumbnails.Set thumbnailSet = youtube.thumbnails().set(htmlString);
+
+        if (youTubeThumbnail.isEmpty()) {
+            return null;
+        }
+        return youTubeThumbnail.attr("src");
     }
 
     public static class FeedResponse {

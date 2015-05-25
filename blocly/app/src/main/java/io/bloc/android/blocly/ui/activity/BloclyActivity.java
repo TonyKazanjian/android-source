@@ -71,7 +71,8 @@ implements
             @Override
             public void onRefresh() {
                 //BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
-                BloclyApplication.getSharedDataSource().fetchNewFeed("http://www.gamesradar.com/ps4/features/rss/",
+                //BloclyApplication.getSharedDataSource().fetchNewFeed("http://pitchfork.com/rss/news/",
+                BloclyApplication.getSharedDataSource().fetchNewFeed("http://dynamic.feedsportal.com/pf/510578/http://www.pcgamer.com/feed/rss2/",
                         // #14
                         new DataSource.Callback<RssFeed>() {
 
