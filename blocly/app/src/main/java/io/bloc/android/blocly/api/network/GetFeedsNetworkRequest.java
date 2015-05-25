@@ -1,7 +1,5 @@
 package io.bloc.android.blocly.api.network;
 
-import com.google.api.services.youtube.YouTube;
-
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
@@ -38,7 +36,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_ATTRIBUTE_URL = "url";
     private static final String XML_ATTRIBUTE_TYPE = "type";
     //checpoint 57 assignment
-    private static final String XML_TAG_IFRAME = "iframe";
+    private static final String XML_TAG_YOUTUBE = "youtube.com/embed";
 
     // #7
     String [] feedUrls;
@@ -83,7 +81,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                     String itemEnclosureMIMEType = null;
                     //for checkpoint 57
 
-                    String itemVideoURL = null;
+                    String itemYouTubeURL = null;
 
                     //8
                     Node itemNode = allItemNodes.item(itemIndex);
@@ -99,6 +97,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                         } else if (XML_TAG_DESCRIPTION.equalsIgnoreCase(tag)) {
                             String descriptionText = tagNode.getTextContent();
                             itemImageURL = parseImageFromHTML(descriptionText);
+                            itemYouTubeURL = parseThumbnail(descriptionText);
                             itemDescription = parseTextFromHTML(descriptionText);
                         } else if (XML_TAG_ENCLOSURE.equalsIgnoreCase(tag)) {
                             NamedNodeMap enclosureAttributes = tagNode.getAttributes();
@@ -112,14 +111,15 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                             String contentEncoded = tagNode.getTextContent();
                             itemImageURL = parseImageFromHTML(contentEncoded);
                             itemContentEncodedText = parseTextFromHTML(contentEncoded);
+                            itemYouTubeURL = parseThumbnail(contentEncoded);
                         } else if (XML_TAG_MEDIA_CONTENT.equalsIgnoreCase(tag)) {
                             NamedNodeMap mediaAttributes = tagNode.getAttributes();
                             itemMediaURL = mediaAttributes.getNamedItem(XML_ATTRIBUTE_URL).getTextContent();
                             itemMediaMIMEType = mediaAttributes.getNamedItem(XML_ATTRIBUTE_TYPE).getTextContent();
                         } //checkpoint 57 assignment
-                        else if (XML_TAG_IFRAME.equalsIgnoreCase(tag)){
-                            NamedNodeMap mediaAttributes = tagNode.getAttributes();
-                            itemVideoURL = mediaAttributes.getNamedItem(XML_TAG_IFRAME).getTextContent();
+                        else if (XML_TAG_YOUTUBE.equalsIgnoreCase(tag)) {
+                            String contentEncoded = tagNode.getTextContent();
+                            itemYouTubeURL = parseThumbnail(contentEncoded);
                         }
 
                     }
@@ -132,6 +132,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                     }
                     if (itemContentEncodedText != null){
                         itemDescription = itemContentEncodedText;
+                        itemYouTubeURL = itemContentEncodedText;
                     }
                     responseItems.add(new ItemResponse(itemURL, itemTitle, itemDescription,
                             itemGUID, itemPubDate, itemEnclosureURL, itemEnclosureMIMEType));
@@ -166,7 +167,6 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         org.jsoup.nodes.Document document = Jsoup.parse(htmlString);
         return document.body().text();
     }
-
     static String parseImageFromHTML(String htmlString) {
         org.jsoup.nodes.Document document = Jsoup.parse(htmlString);
         Elements imgElements = document.select("img");
@@ -178,12 +178,12 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     //checkpoint 57
 
     static String parseThumbnail(String htmlString){
-        YouTube.Thumbnails.Set thumbnailSet = youtube.thumbnails().set(htmlString);
-
-        if (youTubeThumbnail.isEmpty()) {
+       org.jsoup.nodes.Document document = Jsoup.parse(htmlString);
+        Elements youtubeElements = document.select("iframe");
+        if (youtubeElements.isEmpty()){
             return null;
         }
-        return youTubeThumbnail.attr("src");
+        return youtubeElements.attr("src");
     }
 
     public static class FeedResponse {

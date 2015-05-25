@@ -95,7 +95,7 @@ implements
                                                 }
                                                 currentItems.addAll(rssItems);
                                                 // #16
-                                                itemAdapter.notifyItemRangeInserted(0, currentItems.size());
+                                                itemAdapter.notifyDataSetChanged();
                                                 // #17a
                                                 swipeRefreshLayout.setRefreshing(false);
                                             }
