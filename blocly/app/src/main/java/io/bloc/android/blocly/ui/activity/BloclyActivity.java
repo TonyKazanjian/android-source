@@ -1,7 +1,6 @@
 package io.bloc.android.blocly.ui.activity;
 
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -70,8 +69,8 @@ implements
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
-                BloclyApplication.getSharedDataSource().fetchNewFeed("http://www.gamesradar.com/ps4/features/rss/",
+                BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+                //BloclyApplication.getSharedDataSource().fetchNewFeed("http://www.gamesradar.com/ps4/features/rss/",
                         // #14
                         new DataSource.Callback<RssFeed>() {
 
@@ -85,7 +84,7 @@ implements
                                 navigationDrawerAdapter.notifyDataSetChanged();
                                 BloclyApplication.getSharedDataSource().fetchItemsForFeed(rssFeed,
                                         new DataSource.Callback<List<RssItem>>() {
-                                            @SuppressLint("NewApi")
+
                                             @Override
                                             public void onSuccess(List<RssItem> rssItems) {
                                                 // #16b
@@ -115,6 +114,7 @@ implements
                             }
                         });
             }
+
         });
 
         navigationDrawerAdapter = new NavigationDrawerAdapter();

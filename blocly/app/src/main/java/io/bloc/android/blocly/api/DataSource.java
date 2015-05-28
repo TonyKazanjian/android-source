@@ -50,6 +50,11 @@ public class DataSource {
             BloclyApplication.getSharedInstance().deleteDatabase("blocly_db");
         }
     }
+//checkpoint 56 method
+    public void fetchNewItem(RssFeed rssFeed, Callback rssItemCallback){
+        fetchItemsForFeed(rssFeed,rssItemCallback);
+        if ()
+}
 
     public void fetchNewFeed(final String feedURL, final Callback<RssFeed> callback){
         final Handler callbackThreadHandler = new Handler();
