@@ -1,7 +1,6 @@
 package io.bloc.android.blocly.ui.activity;
 
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -72,7 +71,7 @@ implements
             public void onRefresh() {
                 //BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
                 //BloclyApplication.getSharedDataSource().fetchNewFeed("http://pitchfork.com/rss/news/",
-                BloclyApplication.getSharedDataSource().fetchNewFeed("http://dynamic.feedsportal.com/pf/510578/http://www.pcgamer.com/feed/rss2/",
+                BloclyApplication.getSharedDataSource().fetchNewFeed("http://www.pcgamer.com/feed/rss2/",
                         // #14
                         new DataSource.Callback<RssFeed>() {
 
@@ -86,7 +85,7 @@ implements
                                 navigationDrawerAdapter.notifyDataSetChanged();
                                 BloclyApplication.getSharedDataSource().fetchItemsForFeed(rssFeed,
                                         new DataSource.Callback<List<RssItem>>() {
-                                            @SuppressLint("NewApi")
+
                                             @Override
                                             public void onSuccess(List<RssItem> rssItems) {
                                                 // #16b

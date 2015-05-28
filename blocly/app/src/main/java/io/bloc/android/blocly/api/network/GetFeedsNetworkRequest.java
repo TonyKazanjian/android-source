@@ -35,8 +35,6 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     private static final String XML_TAG_ENCLOSURE = "enclosure";
     private static final String XML_ATTRIBUTE_URL = "url";
     private static final String XML_ATTRIBUTE_TYPE = "type";
-    //checpoint 57 assignment
-    private static final String XML_TAG_YOUTUBE = "youtube.com/embed";
 
     // #7
     String [] feedUrls;
@@ -79,9 +77,8 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                     String itemPubDate = null;
                     String itemEnclosureURL = null;
                     String itemEnclosureMIMEType = null;
-                    //for checkpoint 57
+                    String itemYouTubeImage = null;
 
-                    String itemYouTubeURL = null;
 
                     //8
                     Node itemNode = allItemNodes.item(itemIndex);
@@ -97,7 +94,6 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                         } else if (XML_TAG_DESCRIPTION.equalsIgnoreCase(tag)) {
                             String descriptionText = tagNode.getTextContent();
                             itemImageURL = parseImageFromHTML(descriptionText);
-                            itemYouTubeURL = parseThumbnail(descriptionText);
                             itemDescription = parseTextFromHTML(descriptionText);
                         } else if (XML_TAG_ENCLOSURE.equalsIgnoreCase(tag)) {
                             NamedNodeMap enclosureAttributes = tagNode.getAttributes();
@@ -109,19 +105,15 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                             itemGUID = tagNode.getTextContent();
                         } else if (XML_TAG_CONTENT_ENCODED.equalsIgnoreCase(tag)) {
                             String contentEncoded = tagNode.getTextContent();
+                            itemYouTubeImage = parseThumbnail(contentEncoded);
                             itemImageURL = parseImageFromHTML(contentEncoded);
                             itemContentEncodedText = parseTextFromHTML(contentEncoded);
-                            itemYouTubeURL = parseThumbnail(contentEncoded);
+
                         } else if (XML_TAG_MEDIA_CONTENT.equalsIgnoreCase(tag)) {
                             NamedNodeMap mediaAttributes = tagNode.getAttributes();
                             itemMediaURL = mediaAttributes.getNamedItem(XML_ATTRIBUTE_URL).getTextContent();
                             itemMediaMIMEType = mediaAttributes.getNamedItem(XML_ATTRIBUTE_TYPE).getTextContent();
-                        } //checkpoint 57 assignment
-                        else if (XML_TAG_YOUTUBE.equalsIgnoreCase(tag)) {
-                            String contentEncoded = tagNode.getTextContent();
-                            itemYouTubeURL = parseThumbnail(contentEncoded);
                         }
-
                     }
                     if (itemEnclosureURL == null) {
                         itemEnclosureURL = itemImageURL;
@@ -132,8 +124,8 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                     }
                     if (itemContentEncodedText != null){
                         itemDescription = itemContentEncodedText;
-                        itemYouTubeURL = itemContentEncodedText;
                     }
+
                     responseItems.add(new ItemResponse(itemURL, itemTitle, itemDescription,
                             itemGUID, itemPubDate, itemEnclosureURL, itemEnclosureMIMEType));
                 }
@@ -177,13 +169,15 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
     }
     //checkpoint 57
 
-    static String parseThumbnail(String htmlString){
-       org.jsoup.nodes.Document document = Jsoup.parse(htmlString);
-        Elements youtubeElements = document.select("iframe");
-        if (youtubeElements.isEmpty()){
+    static String parseThumbnail(String youTubeURL){
+       org.jsoup.nodes.Document document = Jsoup.parse(youTubeURL);
+        Elements youtubeElements = document.select("FXx_gbdIUKg");
+        org.jsoup.nodes.Document iframeDoc = Jsoup.parse(youtubeElements.get(0).data());
+        Elements iframeElements = iframeDoc.select("iframe");
+        if (iframeElements.isEmpty()){
             return null;
         }
-        return youtubeElements.attr("src");
+        return iframeElements.attr("http://img.youtube.com/vi/"+youtubeElements+"/default.jpg");
     }
 
     public static class FeedResponse {
