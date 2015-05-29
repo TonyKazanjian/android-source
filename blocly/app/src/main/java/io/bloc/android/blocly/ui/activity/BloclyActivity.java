@@ -3,6 +3,8 @@ package io.bloc.android.blocly.ui.activity;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +30,8 @@ import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
+import io.bloc.android.blocly.api.model.database.table.RssFeedTable;
+import io.bloc.android.blocly.api.model.database.table.RssItemTable;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 
@@ -69,9 +73,9 @@ implements
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
-                //BloclyApplication.getSharedDataSource().fetchNewFeed("http://www.gamesradar.com/ps4/features/rss/",
-                        // #14
+
+                BloclyApplication.getSharedDataSource().fetchNewItem("http://feeds.feedburner.com/androidcentral?format=xml",
+
                         new DataSource.Callback<RssFeed>() {
 
                             @Override

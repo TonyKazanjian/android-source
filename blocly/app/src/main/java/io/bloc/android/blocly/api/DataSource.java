@@ -1,6 +1,7 @@
 package io.bloc.android.blocly.api;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 
 import java.text.DateFormat;
@@ -51,10 +52,41 @@ public class DataSource {
         }
     }
 //checkpoint 56 method
-    public void fetchNewItem(RssFeed rssFeed, Callback rssItemCallback){
-        fetchItemsForFeed(rssFeed,rssItemCallback);
-        if ()
-}
+
+    public static Cursor fetchItemsForFeed(SQLiteDatabase readonlyDatabase, long feedRowId) {
+        RssItemTable newItems = new RssItemTable();
+        return readonlyDatabase.query(true, newItems.getName(), null, newItems.get + " = ?",
+                new String[]{String.valueOf(feedRowId)},
+                null, null, COLUMN_PUB_DATE + " DESC", null);
+    }
+    public void fetchNewItem(final String feedURL){
+        long itemId = new RssItemTable().getGU
+       fetchNewFeed(feedURL, new Callback<RssFeed>() {
+           @Override
+           public void onSuccess(RssFeed rssFeed) {
+               GetFeedsNetworkRequest getFeedsNetworkRequest = new GetFeedsNetworkRequest(feedURL);
+               List<GetFeedsNetworkRequest.FeedResponse> feedResponses = getFeedsNetworkRequest.performRequest();
+               //loop throuh feed responses
+               for (GetFeedsNetworkRequest.FeedResponse feed : feedResponses) {
+
+                   //loop through channel items in each feed
+                   for (GetFeedsNetworkRequest.ItemResponse items : feed.channelItems) {
+                       Cursor newItemCursor = RssItemTable.fetchItemsForFeed(databaseOpenHelper.getReadableDatabase(), items.get);
+                       if (newItemCursor.getCount() == 0) {
+                           RssItem fetchedItem = itemFromCursor(newItemCursor);
+                           newItemCursor.close();
+                       }
+                   }
+               }
+           }
+
+           @Override
+           public void onError(String errorMessage) {
+
+           }
+       });
+
+    }
 
     public void fetchNewFeed(final String feedURL, final Callback<RssFeed> callback){
         final Handler callbackThreadHandler = new Handler();
@@ -131,20 +163,22 @@ public class DataSource {
                             .insert(databaseOpenHelper.getWritableDatabase());
                 }
 
-                        Cursor newFeedCursor = rssFeedTable.fetchRow(databaseOpenHelper.getReadableDatabase(), newFeedId);
-                        newFeedCursor.moveToFirst();
-                        final RssFeed fetchedFeed = feedFromCursor(newFeedCursor);
-                        newFeedCursor.close();
-                        callbackThreadHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onSuccess(fetchedFeed);
-                            }
-                        });
+                Cursor newFeedCursor = rssFeedTable.fetchRow(databaseOpenHelper.getReadableDatabase(), newFeedId);
+                newFeedCursor.moveToFirst();
+                final RssFeed fetchedFeed = feedFromCursor(newFeedCursor);
+                newFeedCursor.close();
+                callbackThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onSuccess(fetchedFeed);
                     }
                 });
+            }
+        });
     }
+
     public void fetchItemsForFeed(final RssFeed rssFeed, final Callback<List<RssItem>> callback) {
+
         final Handler callbackThreadHandler = new Handler();
         submitTask(new Runnable() {
             @Override
@@ -169,6 +203,7 @@ public class DataSource {
             }
         });
     }
+
                 // #4a
 
             static RssFeed feedFromCursor(Cursor cursor) {
