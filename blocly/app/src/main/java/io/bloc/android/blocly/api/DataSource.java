@@ -1,8 +1,9 @@
 package io.bloc.android.blocly.api;
 
+import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -53,40 +54,53 @@ public class DataSource {
     }
 //checkpoint 56 method
 
-    public static Cursor fetchItemsForFeed(SQLiteDatabase readonlyDatabase, long feedRowId) {
-        RssItemTable newItems = new RssItemTable();
-        return readonlyDatabase.query(true, newItems.getName(), null, newItems.get + " = ?",
-                new String[]{String.valueOf(feedRowId)},
-                null, null, COLUMN_PUB_DATE + " DESC", null);
+//    public static Cursor fetchItemsForFeed(SQLiteDatabase readonlyDatabase, long feedRowId) {
+//        RssItemTable newItems = new RssItemTable();
+//        return readonlyDatabase.query(true, newItems.getName(), null, newItems.get + " = ?",
+//                new String[]{String.valueOf(feedRowId)},
+//                null, null, COLUMN_PUB_DATE + " DESC", null);
+//    }
+    public void fetchNewItem(final String feedURL, Callback<RssFeed> callback){
+        fetchNewFeed(feedURL, callback = new Callback<RssFeed>() {
+            @Override
+            public void onSuccess(RssFeed rssFeed) {
+                GetFeedsNetworkRequest getFeedsNetworkRequest = new GetFeedsNetworkRequest(feedURL);
+                List<GetFeedsNetworkRequest.FeedResponse> feedResponses = getFeedsNetworkRequest.performRequest();
+                //loop throuh feed responses
+                for (GetFeedsNetworkRequest.FeedResponse feed : feedResponses) {
+
+                    //loop through channel items in each feed
+                    for (GetFeedsNetworkRequest.ItemResponse itemResponse : feed.channelItems) {
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put("guid", itemResponse.itemGUID);
+                        contentValues.put("title", itemResponse.itemTitle);
+                        contentValues.put("link", itemResponse.itemURL);
+                        contentValues.put("description", itemResponse.itemDescription);
+                        long itemPubDate = System.currentTimeMillis();
+                        DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
+                        try {
+                            itemPubDate = dateFormat.parse(itemResponse.itemPubDate).getTime();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        Cursor newItemCursor = RssItemTable.fetchItemsForFeed(databaseOpenHelper.getReadableDatabase(), itemPubDate);
+                        if (newItemCursor.getCount() == 0) {
+                            RssItem fetchedItem = itemFromCursor(newItemCursor);
+                            databaseOpenHelper.getWritableDatabase().insert(fetchedItem.getTitle(), null, contentValues);
+                            newItemCursor.close();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(null, errorMessage, Toast.LENGTH_LONG).show();
+            }
+        });
     }
-    public void fetchNewItem(final String feedURL){
-        long itemId = new RssItemTable().getGU
-       fetchNewFeed(feedURL, new Callback<RssFeed>() {
-           @Override
-           public void onSuccess(RssFeed rssFeed) {
-               GetFeedsNetworkRequest getFeedsNetworkRequest = new GetFeedsNetworkRequest(feedURL);
-               List<GetFeedsNetworkRequest.FeedResponse> feedResponses = getFeedsNetworkRequest.performRequest();
-               //loop throuh feed responses
-               for (GetFeedsNetworkRequest.FeedResponse feed : feedResponses) {
 
-                   //loop through channel items in each feed
-                   for (GetFeedsNetworkRequest.ItemResponse items : feed.channelItems) {
-                       Cursor newItemCursor = RssItemTable.fetchItemsForFeed(databaseOpenHelper.getReadableDatabase(), items.get);
-                       if (newItemCursor.getCount() == 0) {
-                           RssItem fetchedItem = itemFromCursor(newItemCursor);
-                           newItemCursor.close();
-                       }
-                   }
-               }
-           }
 
-           @Override
-           public void onError(String errorMessage) {
-
-           }
-       });
-
-    }
 
     public void fetchNewFeed(final String feedURL, final Callback<RssFeed> callback){
         final Handler callbackThreadHandler = new Handler();
