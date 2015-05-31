@@ -1,9 +1,7 @@
 package io.bloc.android.blocly.api;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Handler;
-import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -54,51 +52,113 @@ public class DataSource {
     }
 //checkpoint 56 method
 
-//    public static Cursor fetchItemsForFeed(SQLiteDatabase readonlyDatabase, long feedRowId) {
-//        RssItemTable newItems = new RssItemTable();
-//        return readonlyDatabase.query(true, newItems.getName(), null, newItems.get + " = ?",
-//                new String[]{String.valueOf(feedRowId)},
-//                null, null, COLUMN_PUB_DATE + " DESC", null);
-//    }
-    public void fetchNewItem(final String feedURL, Callback<RssFeed> callback){
-        fetchNewFeed(feedURL, callback = new Callback<RssFeed>() {
-            @Override
-            public void onSuccess(RssFeed rssFeed) {
-                GetFeedsNetworkRequest getFeedsNetworkRequest = new GetFeedsNetworkRequest(feedURL);
-                List<GetFeedsNetworkRequest.FeedResponse> feedResponses = getFeedsNetworkRequest.performRequest();
-                //loop throuh feed responses
-                for (GetFeedsNetworkRequest.FeedResponse feed : feedResponses) {
+    long insertResponseToFeed(String feedURL, GetFeedsNetworkRequest.ItemResponse itemResponse) {
+        long itemPubDate = System.currentTimeMillis();
+        DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
+        try {
+            itemPubDate = dateFormat.parse(itemResponse.itemPubDate).getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new RssItemTable.Builder()
+                .setTitle(itemResponse.itemTitle)
+                .setDescription(itemResponse.itemDescription)
+                .setEnclosure(itemResponse.itemEnclosureURL)
+                .setMIMEType(itemResponse.itemEnclosureMIMEType)
+                .setLink(itemResponse.itemURL)
+                .setGUID(itemResponse.itemGUID)
+                .setPubDate(itemPubDate)
+                .insert(databaseOpenHelper.getWritableDatabase());
+    }
 
-                    //loop through channel items in each feed
-                    for (GetFeedsNetworkRequest.ItemResponse itemResponse : feed.channelItems) {
-                        ContentValues contentValues = new ContentValues();
-                        contentValues.put("guid", itemResponse.itemGUID);
-                        contentValues.put("title", itemResponse.itemTitle);
-                        contentValues.put("link", itemResponse.itemURL);
-                        contentValues.put("description", itemResponse.itemDescription);
-                        long itemPubDate = System.currentTimeMillis();
-                        DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
-                        try {
-                            itemPubDate = dateFormat.parse(itemResponse.itemPubDate).getTime();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+    public void fetchNewItem(final String feedURL, final Callback callback){
+        final Handler callbackThreadHandler = new Handler();
+        submitTask(new Runnable(){
+            @Override
+            public void run(){
+                GetFeedsNetworkRequest getFeedsNetworkRequest = new GetFeedsNetworkRequest(feedURL);
+                final List<RssItem> newItems = new ArrayList<RssItem>();
+                List<GetFeedsNetworkRequest.FeedResponse> feedResponses = getFeedsNetworkRequest.performRequest();
+                if (getFeedsNetworkRequest.getErrorCode() != 0) {
+                    final String errorMessage;
+                    if (getFeedsNetworkRequest.getErrorCode() == NetworkRequest.ERROR_IO) {
+                        errorMessage = "Network error";
+                    } else if (getFeedsNetworkRequest.getErrorCode() == NetworkRequest.ERROR_MALFORMED_URL) {
+                        errorMessage = "Malformed URL error";
+                    } else if (getFeedsNetworkRequest.getErrorCode() == GetFeedsNetworkRequest.ERROR_PARSING) {
+                        errorMessage = "Error parsing feed";
+                    } else {
+                        errorMessage = "Error unknown";
+                    }
+                    callbackThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onError(errorMessage);
                         }
-                        Cursor newItemCursor = RssItemTable.fetchItemsForFeed(databaseOpenHelper.getReadableDatabase(), itemPubDate);
+                    });
+                    return;
+                }
+                GetFeedsNetworkRequest.FeedResponse feedResponse = feedResponses.get(0);
+                for (GetFeedsNetworkRequest.ItemResponse itemResponse : feedResponse.channelItems){
+                    long newItemRowId = insertResponseToFeed(feedURL, itemResponse);
+                    Cursor newItemCursor = RssItemTable.fetchItemsForFeed(databaseOpenHelper.getReadableDatabase(), newItemRowId);
                         if (newItemCursor.getCount() == 0) {
-                            RssItem fetchedItem = itemFromCursor(newItemCursor);
-                            databaseOpenHelper.getWritableDatabase().insert(fetchedItem.getTitle(), null, contentValues);
+                            newItemCursor.moveToNext();
+                            newItems.add(itemFromCursor(newItemCursor));
                             newItemCursor.close();
                         }
-                    }
+                    callbackThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onSuccess(newItems);
+                        }
+                    });
                 }
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                Toast.makeText(null, errorMessage, Toast.LENGTH_LONG).show();
             }
         });
     }
+
+//    public static Cursor fetchItemsForFeed(SQLiteDatabase readonlyDatabase, long feedRowId) {
+//        RssItemTable newItems = new RssItemTable();
+//        return readonlyDatabase.query(true, newItems.getName(), null, newItems. + " = ?",
+//                new String[]{String.valueOf(feedRowId)},
+//                null, null, COLUMN_PUB_DATE + " DESC", null);
+//    }
+//    public void fetchNewItem(final String feedURL, Callback<RssFeed> callback){
+//        fetchNewFeed(feedURL, callback = new Callback<RssFeed>() {
+//            @Override
+//            public void onSuccess(RssFeed rssFeed) {
+//                GetFeedsNetworkRequest getFeedsNetworkRequest = new GetFeedsNetworkRequest(feedURL);
+//                List<GetFeedsNetworkRequest.FeedResponse> feedResponses = getFeedsNetworkRequest.performRequest();
+//                //loop throuh feed responses
+//                for (GetFeedsNetworkRequest.FeedResponse feed : feedResponses) {
+//
+//                    //loop through channel items in each feed
+//                    for (GetFeedsNetworkRequest.ItemResponse itemResponse : feed.channelItems) {
+//
+//                        long itemPubDate = System.currentTimeMillis();
+//                        DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
+//                        try {
+//                            itemPubDate = dateFormat.parse(itemResponse.itemPubDate).getTime();
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
+//                        Cursor newItemCursor = RssItemTable.fetchItemsForFeed(databaseOpenHelper.getReadableDatabase(), itemPubDate);
+//                        if (newItemCursor.getCount() == 0) {
+//                            RssItem fetchedItem = itemFromCursor(newItemCursor);
+//                            databaseOpenHelper.getWritableDatabase().insert(fetchedItem.getTitle(), null, contentValues);
+//                            newItemCursor.close();
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onError(String errorMessage) {
+//                Toast.makeText(null, errorMessage, Toast.LENGTH_LONG).show();
+//            }
+//        });
+//    }
 
 
 
