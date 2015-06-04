@@ -102,7 +102,7 @@ public class DataSource {
                 for (GetFeedsNetworkRequest.ItemResponse itemResponse : feedResponse.channelItems){
                     long newItemRowId = insertResponseToFeed(feedURL, itemResponse);
                     Cursor newItemCursor = RssItemTable.fetchItemsForFeed(databaseOpenHelper.getReadableDatabase(), newItemRowId);
-                        if (newItemCursor.getCount() == 0) {
+                        if (newItemCursor.getCount() != 0) {
                             newItemCursor.moveToNext();
                             newItems.add(itemFromCursor(newItemCursor));
                             newItemCursor.close();
