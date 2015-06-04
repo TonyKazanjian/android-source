@@ -230,7 +230,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                 if (getDelegate() != null) {
                     getDelegate().onVisitClicked(ItemAdapter.this, rssItem);
                 }
-            }
+                }
         }
 
          /*

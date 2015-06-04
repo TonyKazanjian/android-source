@@ -255,6 +255,27 @@ implements
         startActivity(visitIntent);
     }
 
+
+    public void onFeedClicked(RssItemListFragment rssItemListFragment, String feedURL) {
+        BloclyApplication.getSharedDataSource().fetchNewFeed(feedURL, new DataSource.Callback<RssFeed>() {
+            @Override
+            public void onSuccess(RssFeed rssFeed) {
+                allFeeds.add(rssFeed);
+                navigationDrawerAdapter.notifyDataSetChanged();
+                // #14
+                getFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(rssFeed));
+
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+            }
+        });
+
+    }
+
     /*
      * Private Methods
      */
@@ -278,5 +299,6 @@ implements
         valueAnimator.start();
     }
     }
+
 
 
