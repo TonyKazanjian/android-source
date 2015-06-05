@@ -221,6 +221,7 @@ implements
     @Override
     public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed) {
         drawerLayout.closeDrawers();
+        
         Toast.makeText(this, "Show RSS items from " + rssFeed.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
@@ -255,9 +256,9 @@ implements
         startActivity(visitIntent);
     }
 
-
-    public void onFeedClicked(RssItemListFragment rssItemListFragment, String feedURL) {
-        BloclyApplication.getSharedDataSource().fetchNewFeed(feedURL, new DataSource.Callback<RssFeed>() {
+    @Override
+    public void onFeedClicked(RssItemListFragment rssItemListFragment, RssFeed rssFeed) {
+        BloclyApplication.getSharedDataSource().fetchNewFeed(rssFeed.getFeedUrl(), new DataSource.Callback<RssFeed>() {
             @Override
             public void onSuccess(RssFeed rssFeed) {
                 allFeeds.add(rssFeed);

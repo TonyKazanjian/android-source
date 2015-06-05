@@ -22,7 +22,6 @@ import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
-import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 
 /**
  * Created by tonyk_000 on 6/2/2015.
@@ -198,10 +197,5 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
     public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem) {
         // #9c
         delegate.get().onItemVisitClicked(this, rssItem);
-    }
-
-    @Override
-    public void onFeedClicked(NavigationDrawerAdapter navigationDrawerAdapter, RssFeed rssFeed){
-        delegate.get().onFeedClicked(this, rssFeed);
     }
 }
