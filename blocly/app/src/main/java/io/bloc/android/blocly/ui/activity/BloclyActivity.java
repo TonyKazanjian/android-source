@@ -46,6 +46,7 @@ implements
     private List<RssFeed> allFeeds = new ArrayList<RssFeed>();
     // #12
     private RssItem expandedItem = null;
+    private RssFeed selectedFeed = null;
 
 
     @Override
@@ -221,8 +222,9 @@ implements
     @Override
     public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed) {
         drawerLayout.closeDrawers();
-        
-        Toast.makeText(this, "Show RSS items from " + rssFeed.getTitle(), Toast.LENGTH_SHORT).show();
+        RssItemListFragment feedFragment = new RssItemListFragment();
+
+        onFeedClicked(feedFragment,rssFeed);
     }
 
      /*
@@ -258,15 +260,20 @@ implements
 
     @Override
     public void onFeedClicked(RssItemListFragment rssItemListFragment, RssFeed rssFeed) {
-        BloclyApplication.getSharedDataSource().fetchNewFeed(rssFeed.getFeedUrl(), new DataSource.Callback<RssFeed>() {
+        selectedFeed = rssFeed;
+        BloclyApplication.getSharedDataSource().fetchNewFeed(selectedFeed.getFeedUrl(), new DataSource.Callback<RssFeed>() {
             @Override
             public void onSuccess(RssFeed rssFeed) {
-                allFeeds.add(rssFeed);
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                allFeeds.add(selectedFeed);
                 navigationDrawerAdapter.notifyDataSetChanged();
                 // #14
                 getFragmentManager()
                         .beginTransaction()
-                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(rssFeed));
+                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(selectedFeed))
+                        .commit();
 
             }
 
