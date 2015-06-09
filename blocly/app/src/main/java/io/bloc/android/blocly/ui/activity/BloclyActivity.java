@@ -224,7 +224,7 @@ implements
         drawerLayout.closeDrawers();
         RssItemListFragment feedFragment = new RssItemListFragment();
 
-        onFeedClicked(feedFragment,rssFeed);
+        onFeedClicked(feedFragment, rssFeed);
     }
 
      /*
@@ -259,8 +259,9 @@ implements
     }
 
     @Override
-    public void onFeedClicked(RssItemListFragment rssItemListFragment, RssFeed rssFeed) {
+    public void onFeedClicked(final RssItemListFragment rssItemListFragment, RssFeed rssFeed) {
         selectedFeed = rssFeed;
+        rssItemListFragment.getArguments();
         BloclyApplication.getSharedDataSource().fetchNewFeed(selectedFeed.getFeedUrl(), new DataSource.Callback<RssFeed>() {
             @Override
             public void onSuccess(RssFeed rssFeed) {
@@ -272,7 +273,7 @@ implements
                 // #14
                 getFragmentManager()
                         .beginTransaction()
-                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(selectedFeed))
+                        .add(R.id.fl_activity_blocly, rssItemListFragment.fragmentForRssFeed(selectedFeed))
                         .commit();
 
             }

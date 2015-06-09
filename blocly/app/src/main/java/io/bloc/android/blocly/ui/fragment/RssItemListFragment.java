@@ -22,11 +22,13 @@ import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
+import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 
 /**
  * Created by tonyk_000 on 6/2/2015.
  */
-public class RssItemListFragment extends Fragment implements ItemAdapter.DataSource, ItemAdapter.Delegate {
+public class RssItemListFragment extends Fragment implements ItemAdapter.DataSource, ItemAdapter.Delegate,
+        NavigationDrawerAdapter.NavigationDrawerAdapterDelegate{
 
     // #10 - stores and retrieves RSS feed's identifier from the bundle
     private static final String BUNDLE_EXTRA_RSS_FEED = RssItemListFragment.class.getCanonicalName().concat(".EXTRA_RSS_FEED");
@@ -43,9 +45,12 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
     // #4
     public static interface Delegate {
         public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem);
+
         public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem);
+
         public void onItemVisitClicked(RssItemListFragment rssItemListFragment, RssItem rssItem);
-        public void onFeedClicked (RssItemListFragment rssItemListFragment, RssFeed rssFeed);
+
+        public void onFeedClicked(RssItemListFragment rssItemListFragment, RssFeed rssFeed);
     }
 
     // #5
@@ -65,6 +70,7 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         // #6 - assign this activity as our delegate reference
         delegate = new WeakReference<Delegate>((Delegate) activity);
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +91,8 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
             }
 
             @Override
-            public void onError(String errorMessage) {}
+            public void onError(String errorMessage) {
+            }
         });
     }
 
@@ -198,4 +205,17 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         // #9c
         delegate.get().onItemVisitClicked(this, rssItem);
     }
+
+    //NavigationDrawerAdapterDelegate
+
+    @Override
+    public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed){
+        delegate.get().onFeedClicked(this,rssFeed);
+    }
+    @Override
+    public void didSelectNavigationOption(NavigationDrawerAdapter adapter, NavigationDrawerAdapter.NavigationOption navigationOption){
+
+    }
+
+
 }
