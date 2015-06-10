@@ -260,20 +260,14 @@ implements
 
     @Override
     public void onFeedClicked(final RssItemListFragment rssItemListFragment, RssFeed rssFeed) {
-        selectedFeed = rssFeed;
-        rssItemListFragment.getArguments();
-        BloclyApplication.getSharedDataSource().fetchNewFeed(selectedFeed.getFeedUrl(), new DataSource.Callback<RssFeed>() {
+
+        BloclyApplication.getSharedDataSource().fetchNewFeed(rssFeed.getFeedUrl(), new DataSource.Callback<RssFeed>() {
             @Override
             public void onSuccess(RssFeed rssFeed) {
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
-                allFeeds.add(selectedFeed);
-                navigationDrawerAdapter.notifyDataSetChanged();
-                // #14
+                RssItemListFragment newFragment = RssItemListFragment.fragmentForRssFeed(rssFeed);
                 getFragmentManager()
                         .beginTransaction()
-                        .add(R.id.fl_activity_blocly, rssItemListFragment.fragmentForRssFeed(selectedFeed))
+                        .replace(R.id.fl_activity_blocly, newFragment)
                         .commit();
 
             }
