@@ -1,6 +1,7 @@
 package io.bloc.android.blocly.ui.activity;
 
 import android.animation.ValueAnimator;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -9,9 +10,6 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,7 +44,7 @@ implements
     private List<RssFeed> allFeeds = new ArrayList<RssFeed>();
     // #12
     private RssItem expandedItem = null;
-    private RssFeed selectedFeed = null;
+
 
 
     @Override
@@ -56,15 +54,17 @@ implements
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
+//
+//        RecyclerView navigationRecyclerView = (RecyclerView) findViewById((R.id.rv_nav_activity_blocly));
+//
+//        navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//        navigationRecyclerView.setAdapter(navigationDrawerAdapter);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         navigationDrawerAdapter = new NavigationDrawerAdapter();
         navigationDrawerAdapter.setDelegate(this);
         navigationDrawerAdapter.setDataSource(this);
-        RecyclerView navigationRecyclerView = (RecyclerView) findViewById((R.id.rv_nav_activity_blocly));
-
-        navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        navigationRecyclerView.setAdapter(navigationDrawerAdapter);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         BloclyApplication.getSharedDataSource().fetchAllFeeds(new DataSource.Callback<List<RssFeed>>() {
             @Override
@@ -259,17 +259,22 @@ implements
     }
 
     @Override
-    public void onFeedClicked(final RssItemListFragment rssItemListFragment, RssFeed rssFeed) {
-
+    public void onFeedClicked(final RssItemListFragment rssItemListFragment, final RssFeed rssFeed) {
         BloclyApplication.getSharedDataSource().fetchNewFeed(rssFeed.getFeedUrl(), new DataSource.Callback<RssFeed>() {
             @Override
             public void onSuccess(RssFeed rssFeed) {
                 RssItemListFragment newFragment = RssItemListFragment.fragmentForRssFeed(rssFeed);
-                getFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fl_activity_blocly, newFragment)
-                        .commit();
-
+                FragmentManager fragManager = getFragmentManager();
+                if (fragManager.findFragmentByTag(rssFeed.getFeedUrl()) != null) {
+                    //first check the fragmanage to see if the fragment for this feed url already exists
+                    fragManager.beginTransaction().show(fragManager.findFragmentByTag(rssFeed.getFeedUrl()))
+                    .commit();
+                } else
+                    fragManager.beginTransaction()
+                            .replace(R.id.fl_activity_blocly, newFragment)
+                            //.add(R.id.feed_fragment,newFragment,rssFeed.getFeedUrl())
+                            .addToBackStack(rssFeed.getFeedUrl())
+                            .commit();
             }
 
             @Override

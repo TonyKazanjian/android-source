@@ -1,5 +1,6 @@
 package io.bloc.android.blocly.api;
 
+import android.app.FragmentManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
@@ -153,7 +154,7 @@ public class DataSource {
         });
     }
 
-    public void fetchNewFeed(final String feedURL, final Callback<RssFeed> callback){
+    public FragmentManager fetchNewFeed(final String feedURL, final Callback<RssFeed> callback){
         final Handler callbackThreadHandler = new Handler();
 
         submitTask(new Runnable() {
@@ -205,6 +206,7 @@ public class DataSource {
                         });
                     }
                 });
+        return null;
     }
     public void fetchItemsForFeed(final RssFeed rssFeed, final Callback<List<RssItem>> callback) {
         final Handler callbackThreadHandler = new Handler();
