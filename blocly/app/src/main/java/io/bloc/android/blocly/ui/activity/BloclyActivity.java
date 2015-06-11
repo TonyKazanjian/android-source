@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,16 +58,18 @@ implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
 //
-//        RecyclerView navigationRecyclerView = (RecyclerView) findViewById((R.id.rv_nav_activity_blocly));
 //
-//        navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        navigationRecyclerView.setAdapter(navigationDrawerAdapter);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         navigationDrawerAdapter = new NavigationDrawerAdapter();
         navigationDrawerAdapter.setDelegate(this);
         navigationDrawerAdapter.setDataSource(this);
+
+        RecyclerView navigationRecyclerView = (RecyclerView) findViewById((R.id.rv_nav_activity_blocly));
+
+        navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        navigationRecyclerView.setAdapter(navigationDrawerAdapter);
 
         BloclyApplication.getSharedDataSource().fetchAllFeeds(new DataSource.Callback<List<RssFeed>>() {
             @Override
@@ -266,13 +271,14 @@ implements
                 RssItemListFragment newFragment = RssItemListFragment.fragmentForRssFeed(rssFeed);
                 FragmentManager fragManager = getFragmentManager();
                 if (fragManager.findFragmentByTag(rssFeed.getFeedUrl()) != null) {
-                    //first check the fragmanage to see if the fragment for this feed url already exists
+                    //first check the fragmanager to see if the fragment for this feed url already exists
                     fragManager.beginTransaction().show(fragManager.findFragmentByTag(rssFeed.getFeedUrl()))
-                    .commit();
+                            .commit();
                 } else
                     fragManager.beginTransaction()
-                            .replace(R.id.fl_activity_blocly, newFragment)
-                            //.add(R.id.feed_fragment,newFragment,rssFeed.getFeedUrl())
+                            //replacing the framelayout
+                            .replace(R.id.srl_fragment_rss_list, newFragment)
+                            .add(R.id.fl_activity_blocly,rssItemListFragment,rssFeed.getFeedUrl())
                             .addToBackStack(rssFeed.getFeedUrl())
                             .commit();
             }
