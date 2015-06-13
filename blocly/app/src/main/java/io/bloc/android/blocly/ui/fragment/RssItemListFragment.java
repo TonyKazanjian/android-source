@@ -210,12 +210,10 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
 
     @Override
     public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed){
-        delegate.get().onFeedClicked(this,rssFeed);
+        delegate.get().onFeedClicked(this, rssFeed);
     }
     @Override
     public void didSelectNavigationOption(NavigationDrawerAdapter adapter, NavigationDrawerAdapter.NavigationOption navigationOption){
 
     }
-
-
 }

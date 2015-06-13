@@ -229,7 +229,7 @@ implements
         drawerLayout.closeDrawers();
         RssItemListFragment feedFragment = new RssItemListFragment();
 
-        onFeedClicked(feedFragment, rssFeed);
+        this.onFeedClicked(feedFragment, rssFeed);
     }
 
      /*
@@ -272,15 +272,16 @@ implements
                 FragmentManager fragManager = getFragmentManager();
                 if (fragManager.findFragmentByTag(rssFeed.getFeedUrl()) != null) {
                     //first check the fragmanager to see if the fragment for this feed url already exists
-                    fragManager.beginTransaction().show(fragManager.findFragmentByTag(rssFeed.getFeedUrl()))
-                            .commit();
-                } else
                     fragManager.beginTransaction()
-                            //replacing the framelayout
-                            .replace(R.id.srl_fragment_rss_list, newFragment)
-                            .add(R.id.fl_activity_blocly,rssItemListFragment,rssFeed.getFeedUrl())
-                            .addToBackStack(rssFeed.getFeedUrl())
+                                    .add(rssItemListFragment,rssFeed.getFeedUrl())
                             .commit();
+                            //getFragmentManager().popBackStack();
+                }
+                fragManager.beginTransaction()
+                        //replacing the framelayout
+                        .replace(R.id.fl_activity_blocly, newFragment)
+                        .addToBackStack(rssFeed.getFeedUrl())
+                        .commit();
             }
 
             @Override
@@ -288,6 +289,14 @@ implements
             }
         });
 
+    }
+
+    public void onBackPressed() {
+        if (getFragmentManager().getBackStackEntryCount() == 0) {
+            super.onBackPressed();
+        } else {
+            getFragmentManager().popBackStack();
+        }
     }
 
     /*
