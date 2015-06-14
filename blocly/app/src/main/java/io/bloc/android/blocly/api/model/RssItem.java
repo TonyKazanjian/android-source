@@ -1,9 +1,12 @@
 package io.bloc.android.blocly.api.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by tonyk_000 on 3/11/2015.
  */
-public class RssItem extends Model {
+public class RssItem extends Model implements Parcelable {
     private String guid;
     private String title;
     private String description;
@@ -14,6 +17,32 @@ public class RssItem extends Model {
     private boolean read;
     private boolean favorite;
     private boolean archived;
+
+    public static final Creator<RssItem> CREATOR = new Creator<RssItem>() {
+        @Override
+        public RssItem createFromParcel(Parcel source) {
+            return new RssItem(source);
+        }
+
+        @Override
+        public RssItem[] newArray(int size) {
+            return new RssItem[size];
+        }
+    };
+
+    public RssItem(Parcel src) {
+        super(src.readLong());
+        this.guid = src.readString();
+        this.title = src.readString();
+        this.description = src.readString();
+        this.url = src.readString();
+        this.imageUrl = src.readString();
+        this.rssFeedId = src.readLong();
+        this.datePublished = src.readLong();
+        this.read = src.readInt() == 1;
+        this.favorite = src.readInt() == 1;
+        this.archived = src.readInt() == 1;
+    }
 
     public RssItem(long rowId, String guid, String title, String description, String url, String imageUrl, long rssFeedId, long datePublished, boolean read, boolean favorite, boolean archived) {
         super(rowId);
@@ -67,5 +96,25 @@ public class RssItem extends Model {
 
     public boolean isArchived() {
         return archived;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(getRowId());
+        dest.writeString(guid);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(url);
+        dest.writeString(imageUrl);
+        dest.writeLong(rssFeedId);
+        dest.writeLong(datePublished);
+        dest.writeInt(read ? 1 : 0);
+        dest.writeInt(favorite ? 1 : 0);
+        dest.writeInt(archived ? 1 : 0);
     }
 }
