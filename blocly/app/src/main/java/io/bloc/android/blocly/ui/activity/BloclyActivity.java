@@ -53,6 +53,7 @@ implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_blocly);
 
         onTablet = findViewById(R.id.fl_activity_blocly_right_pane) != null;
@@ -208,7 +209,8 @@ implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.blocly, menu);
         this.menu = menu;
-        animateShareItem(expandedItem != null);
+        RssItemListFragment rssItemListFragment = new RssItemListFragment();
+        animateShareItem(rssItemListFragment,expandedItem != null);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -251,14 +253,14 @@ implements
 
             return;
         }
-        animateShareItem(expandedItem != null);
+        animateShareItem(rssItemListFragment,expandedItem != null);
     }
 
     public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem) {
         if (expandedItem == rssItem) {
             expandedItem = null;
         }
-        animateShareItem(expandedItem != null);
+        animateShareItem(rssItemListFragment,expandedItem != null);
     }
 
     @Override
@@ -271,8 +273,10 @@ implements
      * Private Methods
      */
 
-    private void animateShareItem(final boolean enabled) {
+    private void animateShareItem(RssItemListFragment rssItemListFragment, final boolean enabled) {
         MenuItem shareItem = menu.findItem(R.id.action_share);
+        if (onTablet)
+            shareItem = menu.findItem(R.id.tablet_action_share);
         if (shareItem.isEnabled() == enabled) {
             return;
         }

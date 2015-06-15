@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:blocly="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_share"
+    <item android:id="@+id/tablet_action_share"
         android:icon="@drawable/ic_share_selector"
         android:title="@string/menu_share"
         android:orderInCategory="0"
