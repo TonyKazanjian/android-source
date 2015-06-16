@@ -20,7 +20,8 @@
             android:id="@+id/v_activity_blocly_actionbar_padding"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" />
+            android:background="?attr/colorPrimary"
+            android:layout_below="@+id/tb_activity_blocly"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,62 +44,6 @@
                 android:background="@color/white_primary"
                 android:elevation="4dp">
 
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/fl_tb_activity_blocly"
-                    android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:layout_marginBottom= "@id/tb_activity_blocly"
-                    android:background="?attr/colorPrimary"
-                    android:layout_gravity="center_horizontal|top" />
-
-                <CheckBox
-                    android:id="@+id/cb_rss_item_check_mark"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"
-                    android:button="@drawable/btn_check_checkbox"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_gravity="right|top" />
-
-                <CheckBox
-                    android:id="@+id/cb_rss_item_favorite_star"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"
-                    android:button="@drawable/btn_star_checkbox"
-                    android:layout_gravity="right|top"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginRight="45dp"
-                    tools:ignore="RtlCompat" />
-
-                <io.bloc.android.blocly.ui.widget.RobotoTextView
-                    style="@style/Button"
-                    android:id="@+id/tv_rss_item_visit_site"
-                    android:text="visit site"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:paddingTop="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="8dp"
-                    android:layout_gravity="left|top"/>
-
-                <ScrollView
-                    android:id="@+id/scrollableContents"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_below="@id/tb_activity_blocly">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    </LinearLayout>
-                </ScrollView>
-
             </FrameLayout>
 
         </LinearLayout>
@@ -106,6 +51,7 @@
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
+
         android:id="@+id/rv_nav_activity_blocly"
         android:layout_width="280dp"
         android:layout_height="match_parent"

@@ -4,25 +4,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
         <FrameLayout
             android:id="@+id/fl_fragment_rss_item_detail_header"
             android:layout_width="match_parent"
-            android:layout_height="320dp">
+            android:layout_height="45dp">
+
+            <android.support.v7.widget.Toolbar
+            android:id="@+id/fl_tb_activity_blocly"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/white_primary_54"
+            android:layout_gravity="center_horizontal|top" />
+
+            <CheckBox
+                android:id="@+id/cb_rss_item_favorite_star"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:button="@drawable/btn_star_checkbox"
+                android:layout_gravity="right|top"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginRight="45dp"/>
 
 
-            <ImageView
+            <CheckBox
+                android:id="@+id/cb_rss_item_check_mark"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:button="@drawable/btn_check_checkbox"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_gravity="right|top" />
+
+            <io.bloc.android.blocly.ui.widget.RobotoTextView
+                style="@style/Button"
+                android:id="@+id/tv_rss_item_visit_site"
+                android:text="visit site"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:paddingTop="8dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="8dp"
+                android:layout_gravity="left|top"/>
+            </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fl_fragment_rss_item_detail_header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+        <ImageView
                 android:id="@+id/iv_fragment_rss_item_detail_header"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"/>
 
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/white_primary_54"/>
-
 
             <ProgressBar
                 android:id="@+id/pb_fragment_rss_item_detail_header"
@@ -32,50 +81,32 @@
                 android:indeterminateOnly="true"
                 android:layout_gravity="center"/>
 
-        </FrameLayout>
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/tb_activity_blocly"
-        android:layout_width="match_parent"
-
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@color/white_primary"/>
-
-
-        <ScrollView
-            android:id="@+id/scrollableContents"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/tb_activity_blocly">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
         <io.bloc.android.blocly.ui.widget.RobotoTextView
             style="@style/RssItemDetailHeader"
             android:id="@+id/tv_fragment_rss_item_detail_title"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/fl_fragment_rss_item_detail_header"
             android:layout_marginBottom="24dp"
             android:layout_marginRight="24dp"
             android:layout_marginLeft="24dp"/>
+
 
         <io.bloc.android.blocly.ui.widget.RobotoTextView
             style="@style/Body1"
             android:id="@+id/tv_fragment_rss_item_detail_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/fl_fragment_rss_item_detail_header"
             android:layout_marginLeft="24dp"
             android:layout_marginTop="24dp"
             android:layout_marginRight="24dp"
             android:layout_marginBottom="24dp"/>
 
+
             </LinearLayout>
 
-        </ScrollView>
+    </ScrollView>
+
 
 </RelativeLayout>
