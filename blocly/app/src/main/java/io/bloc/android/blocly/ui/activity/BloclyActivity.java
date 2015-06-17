@@ -48,6 +48,7 @@ implements
     // #12
     private RssItem expandedItem = null;
     private boolean onTablet;
+    private RssItemDetailFragment fragmentRssItemDetail;
 
 
     @Override
@@ -275,8 +276,8 @@ implements
 
     private void animateShareItem(RssItemListFragment rssItemListFragment, final boolean enabled) {
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        if (onTablet)
-            shareItem = menu.findItem(R.id.tablet_action_share);
+//        if (onTablet)
+//            shareItem =
         if (shareItem.isEnabled() == enabled) {
             return;
         }

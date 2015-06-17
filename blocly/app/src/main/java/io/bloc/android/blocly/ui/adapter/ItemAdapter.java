@@ -175,6 +175,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                 // Recover Tablet Views
                 onTablet = true;
                 callout = (TextView) itemView.findViewById(R.id.tv_rss_item_callout);
+
                 // #3
                 if (Build.VERSION.SDK_INT >= 21) {
                     callout.setOutlineProvider(new ViewOutlineProvider() {

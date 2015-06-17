@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:blocly="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -36,6 +37,15 @@
                 android:layout_marginBottom="16dp"
                 android:layout_marginRight="8dp"
                 android:layout_gravity="right|top" />
+
+            <item android:id="@+id/action_share"
+                android:button="@drawable/ic_share_selector"
+                android:title="@string/menu_share"
+                android:layout_gravity="center|center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginRight="8dp"
+                android:showAsAction="always"/>
 
             <io.bloc.android.blocly.ui.widget.RobotoTextView
                 style="@style/Button"

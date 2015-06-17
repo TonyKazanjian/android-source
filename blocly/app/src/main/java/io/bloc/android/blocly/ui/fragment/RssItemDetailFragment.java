@@ -24,11 +24,12 @@ import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssItem;
+import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 
 /**
  * Created by tonyk_000 on 6/5/2015.
  */
-public class RssItemDetailFragment extends Fragment implements ImageLoadingListener {
+public class RssItemDetailFragment extends Fragment  implements ImageLoadingListener, ItemAdapter.Delegate, View.OnClickListener {
 
     private static final String BUNDLE_EXTRA_RSS_ITEM = RssItemDetailFragment.class.getCanonicalName().concat(".EXTRA_RSS_ITEM");
 
@@ -46,6 +47,11 @@ public class RssItemDetailFragment extends Fragment implements ImageLoadingListe
     TextView content;
     ProgressBar progressBar;
     Toolbar mToolbar;
+    TextView visitSite;
+
+    //for onVisitCLicked
+    ItemAdapter tabletAdapter = new ItemAdapter();
+    RssItem rssItem;
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
@@ -69,7 +75,6 @@ public class RssItemDetailFragment extends Fragment implements ImageLoadingListe
                 ImageLoader.getInstance().loadImage(rssItem.getImageUrl(), RssItemDetailFragment.this);
             }
 
-
             @Override
             public void onError(String errorMessage) {
             }
@@ -80,6 +85,8 @@ public class RssItemDetailFragment extends Fragment implements ImageLoadingListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View inflate = inflater.inflate(R.layout.fragment_rss_item_detail, container, false);
         mToolbar = (Toolbar) inflate.findViewById(R.id.fl_tb_activity_blocly);
+        visitSite = (TextView)inflate.findViewById(R.id.tv_rss_item_visit_site);
+        visitSite.setOnClickListener(this);
         headerImage = (ImageView) inflate.findViewById(R.id.iv_fragment_rss_item_detail_header);
         progressBar = (ProgressBar) inflate.findViewById(R.id.pb_fragment_rss_item_detail_header);
         title = (TextView) inflate.findViewById(R.id.tv_fragment_rss_item_detail_title);
@@ -89,7 +96,7 @@ public class RssItemDetailFragment extends Fragment implements ImageLoadingListe
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.rss_item_detail, menu);
+        inflater.inflate(R.menu.blocly, menu);
     }
 
         /*
@@ -136,4 +143,22 @@ public class RssItemDetailFragment extends Fragment implements ImageLoadingListe
 
     @Override
     public void onLoadingCancelled(String imageUri, View view) {}
+
+    /*
+    ItemAdapter.Delegate
+     */
+
+    public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem) {
+
+            if (tabletAdapter.getDelegate() != null) {
+                tabletAdapter.getDelegate().onVisitClicked(tabletAdapter, rssItem);
+            }
+    }
+    public void onItemClicked(ItemAdapter itemAdapter, RssItem rssItem){}
+
+    public void onClick(View view){
+        onVisitClicked(tabletAdapter,rssItem);
+    }
+
 }
+
