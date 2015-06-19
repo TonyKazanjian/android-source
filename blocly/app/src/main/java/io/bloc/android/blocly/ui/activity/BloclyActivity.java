@@ -46,7 +46,7 @@ implements
     private View overflowButton;
     private List<RssFeed> allFeeds = new ArrayList<RssFeed>();
     // #12
-    private RssItem expandedItem = null;
+    private RssItem expandedItem;
     private boolean onTablet;
     private RssItemDetailFragment fragmentRssItemDetail;
 
@@ -103,7 +103,7 @@ implements
                 }
                 for (int i = 0; i < menu.size(); i++) {
                     MenuItem item = menu.getItem(i);
-                    if(item.getItemId() == R.id.action_share && expandedItem==null){
+                    if (item.getItemId() == R.id.action_share && expandedItem == null) {
                         continue;
                     }
                     item.setEnabled(true);
@@ -172,7 +172,7 @@ implements
         super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
     }
-
+    //determines when your switching to landscape or portrait
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -186,14 +186,14 @@ implements
         }
         if (item.getItemId() == R.id.action_share) {
             RssItem itemToShare = expandedItem;
-            if (itemToShare == null){
+            if (itemToShare == null) {
                 return false;
             }
             //#4
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             //#5
             shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s (%s)", itemToShare.getTitle(),
-                  itemToShare.getUrl()));
+                    itemToShare.getUrl()));
             // #6
             shareIntent.setType("text/plain");
             // #7
@@ -209,9 +209,15 @@ implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.blocly, menu);
+        MenuItem shareItem = (MenuItem)menu.findItem(R.id.action_share);
+
+        if (onTablet) {
+            //fragmentRssItemDetail = RssItemDetailFragment.detailFragmentForRssItem(expandedItem);
+            shareItem.setVisible(false);
+            //fragmentRssItemDetail.onCreateOptionsMenu(menu);
+        }
         this.menu = menu;
-        RssItemListFragment rssItemListFragment = new RssItemListFragment();
-        animateShareItem(rssItemListFragment,expandedItem != null);
+        animateShareItem(expandedItem != null);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -254,14 +260,14 @@ implements
 
             return;
         }
-        animateShareItem(rssItemListFragment,expandedItem != null);
+        animateShareItem(expandedItem != null);
     }
 
     public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem) {
         if (expandedItem == rssItem) {
             expandedItem = null;
         }
-        animateShareItem(rssItemListFragment,expandedItem != null);
+        animateShareItem(expandedItem != null);
     }
 
     @Override
@@ -274,27 +280,27 @@ implements
      * Private Methods
      */
 
-    private void animateShareItem(RssItemListFragment rssItemListFragment, final boolean enabled) {
+    private void animateShareItem(final boolean enabled) {
         MenuItem shareItem = menu.findItem(R.id.action_share);
-//        if (onTablet)
-//            shareItem =
-        if (shareItem.isEnabled() == enabled) {
-            return;
-        }
-
-        shareItem.setEnabled(enabled);
-        final Drawable shareIcon = shareItem.getIcon();
-        ValueAnimator valueAnimator = ValueAnimator.ofInt(enabled ? new int[]{0,255}: new int[]{255,0});
-        valueAnimator.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
-        valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                shareIcon.setAlpha((Integer) animation.getAnimatedValue());
+            if (shareItem.isEnabled() == enabled) {
+                return;
             }
-        });
-        valueAnimator.start();
+
+
+            shareItem.setEnabled(enabled);
+            final Drawable shareIcon = shareItem.getIcon();
+            ValueAnimator valueAnimator = ValueAnimator.ofInt(enabled ? new int[]{0, 255} : new int[]{255, 0});
+            valueAnimator.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
+            valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    shareIcon.setAlpha((Integer) animation.getAnimatedValue());
+                }
+            });
+            valueAnimator.start();
+        }
     }
-    }
+
 
 
